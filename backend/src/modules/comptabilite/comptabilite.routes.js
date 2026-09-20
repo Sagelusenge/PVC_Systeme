@@ -1,0 +1,26 @@
+const express = require("express");
+const c = require("./comptabilite.controller");
+const s = require("./comptabilite.validation");
+const validate = require("../../middlewares/validation.middleware");
+const allowRoles = require("../../middlewares/role.middleware");
+const asyncHandler = require("../../utils/asyncHandler");
+const router = express.Router();
+const manage = allowRoles("Comptable", "Direction");
+const crud = (path, controller, createSchema, updateSchema) => {
+  router.get(path, asyncHandler(controller.list)); router.get(`${path}/:id`, asyncHandler(controller.get));
+  router.post(path, manage, validate(createSchema), asyncHandler(controller.create)); router.patch(`${path}/:id`, manage, validate(updateSchema), asyncHandler(controller.update));
+};
+router.get("/references", asyncHandler(c.references));
+router.get("/taux", asyncHandler(c.getExchangeRate));
+router.patch("/taux", manage, validate(s.updateExchangeRate), asyncHandler(c.updateExchangeRate));
+crud("/comptes", c.comptes, s.createCompte, s.updateCompte);
+crud("/sous-comptes", c.sousComptes, s.createSousCompte, s.updateSousCompte);
+crud("/journaux", c.journaux, s.createJournal, s.updateJournal);
+crud("/ecritures", c.ecritures, s.createEcriture, s.updateEcriture);
+router.get("/journal-operations", asyncHandler(c.report("v_journal_operations")));
+router.get("/balance-generale", asyncHandler(c.report("v_balance_generale")));
+router.get("/balance-comptes", asyncHandler(c.report("v_balance_comptes")));
+router.get("/bilan", asyncHandler(c.report("v_bilan")));
+router.get("/compte-resultat", asyncHandler(c.report("v_compte_resultat")));
+router.get("/resultat-net", asyncHandler(c.report("v_resultat_net")));
+module.exports = router;

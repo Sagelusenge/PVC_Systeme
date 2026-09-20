@@ -1,0 +1,2 @@
+ALTER TABLE tutilisateurs
+  ADD COLUMN IF NOT EXISTS photo_url LONGTEXT NULL AFTER email;

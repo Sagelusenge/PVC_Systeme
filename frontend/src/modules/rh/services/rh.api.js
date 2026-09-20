@@ -1,0 +1,1 @@
+import {get,post} from "../../../services/api";export const listPersonnel=()=>get("/rh/personnel?limit=100");export const listPresences=()=>get("/rh/presences?limit=100");export const listPayroll=()=>get("/rh/paie");export const createPersonnel=data=>post("/rh/personnel",data);export const createPresence=data=>post("/rh/presences",data);

@@ -1,0 +1,15 @@
+const express = require("express");
+const c = require("./immobilisation.controller");
+const v = require("./immobilisation.validation");
+const validate = require("../../middlewares/validation.middleware");
+const allowRoles = require("../../middlewares/role.middleware");
+const asyncHandler = require("../../utils/asyncHandler");
+const router = express.Router();
+const manage = allowRoles("Responsable immobilisations", "Comptable", "Direction");
+router.get("/plans", asyncHandler(c.allPlans));
+router.get("/materiels", asyncHandler(c.materials.list));
+router.get("/materiels/:id", asyncHandler(c.materials.get));
+router.get("/materiels/:id/plan", asyncHandler(c.plan));
+router.post("/materiels", manage, validate(v.create), asyncHandler(c.materials.create));
+router.patch("/materiels/:id", manage, validate(v.update), asyncHandler(c.materials.update));
+module.exports = router;

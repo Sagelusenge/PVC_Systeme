@@ -1,0 +1,12 @@
+const express = require("express");
+const controller = require("./vente.controller");
+const schemas = require("./vente.validation");
+const validate = require("../../middlewares/validation.middleware");
+const allowRoles = require("../../middlewares/role.middleware");
+const asyncHandler = require("../../utils/asyncHandler");
+const router = express.Router();
+router.get("/", asyncHandler(controller.list));
+router.get("/:id", asyncHandler(controller.get));
+router.post("/", allowRoles("Commercial", "Caissier", "Direction"), validate(schemas.createSchema), asyncHandler(controller.create));
+router.patch("/:id", allowRoles("Direction"), validate(schemas.updateSchema), asyncHandler(controller.update));
+module.exports = router;

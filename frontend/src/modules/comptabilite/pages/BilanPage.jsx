@@ -1,0 +1,11 @@
+import useFetch from "../../../hooks/useFetch";
+import { getBilan, getResult } from "../services/comptabilite.api";
+import AccountingNav from "../components/AccountingNav";
+import Table from "../../../components/common/Table";
+import Badge from "../../../components/common/Badge";
+import Loader from "../../../components/common/Loader";
+import StatCard from "../../dashboard/components/StatCard";
+import { Landmark, Scale } from "lucide-react";
+import { formatCurrency } from "../../../utils/currency";
+
+export default function BilanPage(){const state=useFetch(async()=>({bilan:await getBilan(),result:await getResult()}),[]);if(state.loading)return<Loader/>;const bilan=state.data?.bilan||[],result=state.data?.result||[];const actif=bilan.filter((row)=>row.nature_compte==="ACTIF").reduce((sum,row)=>sum+Number(row.solde||0),0);const passif=bilan.filter((row)=>row.nature_compte==="PASSIF").reduce((sum,row)=>sum+Number(row.solde||0),0);const columns=[{key:"nature_compte",label:"Nature",render:(value)=><Badge tone={value==="ACTIF"?"green":"orange"}>{value}</Badge>},{key:"compte",label:"Compte"},{key:"compte_intitule",label:"Intitule compte"},{key:"sous_compte",label:"Sous-compte"},{key:"sous_compte_intitule",label:"Intitule sous-compte"},{key:"solde",label:"Solde",numeric:true,render:(value)=>formatCurrency(value)}];return <div className="page"><header className="page-header"><div><span className="eyebrow">Etats financiers // SYSCOHADA</span><h1>Bilan Actif & Passif</h1><p>Situation patrimoniale et resultat comptable consolides.</p></div></header><AccountingNav/><section className="metrics"><StatCard label="Total actif" value={formatCurrency(actif)} detail="Comptes de nature actif" icon={Landmark}/><StatCard label="Total passif" value={formatCurrency(passif)} detail="Comptes de nature passif" icon={Landmark} tone="orange"/><StatCard label="Ecart bilan" value={formatCurrency(Math.abs(actif-passif))} detail="Controle actif / passif" icon={Scale} tone={actif===passif?"green":"red"}/><StatCard label="Lignes resultat" value={result.length} detail="Comptes de gestion" icon={Scale} tone="green"/></section><section className="panel"><div className="panel-head"><h2>Situation des comptes patrimoniaux</h2><Badge>{bilan.length} lignes</Badge></div><Table rows={bilan} columns={columns}/></section></div>}

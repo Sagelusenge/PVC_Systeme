@@ -1,0 +1,1 @@
+import{get,post}from"../../../services/api";export const listAssets=()=>get("/immobilisations/materiels?limit=100");export const listPlans=()=>get("/immobilisations/plans");export const createAsset=data=>post("/immobilisations/materiels",data);

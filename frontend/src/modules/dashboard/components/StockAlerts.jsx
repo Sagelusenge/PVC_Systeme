@@ -1,0 +1,2 @@
+import Badge from "../../../components/common/Badge";
+export default function StockAlerts({ rows = [] }) { return rows.length ? rows.map((item)=><div className="list-row" key={item.id}><div><strong>{item.designation}</strong><small>{item.reference} // seuil {item.seuil_reappro} {item.unite_mesure}</small></div><div style={{textAlign:"right"}}><strong className="mono" style={{color:"var(--red)"}}>{item.stock_actuel}</strong><br/><Badge tone="red">Critique</Badge></div></div>) : <div className="empty" style={{minHeight:120}}>Aucune alerte de stock</div>; }

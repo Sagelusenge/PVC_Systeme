@@ -1,0 +1,10 @@
+import { useState } from "react";
+import useFetch from "../../../hooks/useFetch";
+import { getBalance, getBalanceAccounts } from "../services/comptabilite.api";
+import AccountingNav from "../components/AccountingNav";
+import Loader from "../../../components/common/Loader";
+import Table from "../../../components/common/Table";
+import Badge from "../../../components/common/Badge";
+import { formatCurrency } from "../../../utils/currency";
+
+export default function BalanceGeneralePage(){const state=useFetch(async()=>({balance:await getBalance(),accounts:await getBalanceAccounts()}),[]);const[detail,setDetail]=useState(false);if(state.loading)return<Loader/>;const rows=detail?state.data?.accounts||[]:state.data?.balance||[];const columns=detail?[{key:"compte",label:"Compte"},{key:"sous_compte",label:"Sous-compte"},{key:"sous_compte_intitule",label:"Intitule"},{key:"total_debit",label:"Debit",numeric:true,render:(value)=>formatCurrency(value)},{key:"total_credit",label:"Credit",numeric:true,render:(value)=>formatCurrency(value)},{key:"solde",label:"Solde",numeric:true,render:(value)=>formatCurrency(value)}]:[{key:"compte",label:"Compte"},{key:"compte_intitule",label:"Intitule"},{key:"total_debit",label:"Debit",numeric:true,render:(value)=>formatCurrency(value)},{key:"total_credit",label:"Credit",numeric:true,render:(value)=>formatCurrency(value)},{key:"solde",label:"Solde",numeric:true,render:(value)=>formatCurrency(value)}];return <div className="page"><header className="page-header"><div><span className="eyebrow">Controle comptable // soldes cumules</span><h1>Balance Generale</h1><p>Verification des debits, credits et soldes par compte.</p></div></header><AccountingNav/><div className="toolbar"><div className="tabs"><button className={`tab ${!detail?"active":""}`} onClick={()=>setDetail(false)}>Par compte</button><button className={`tab ${detail?"active":""}`} onClick={()=>setDetail(true)}>Par sous-compte</button></div></div><section className="panel"><div className="panel-head"><h2>{detail?"Balance detaillee":"Balance generale"}</h2><Badge>{rows.length} lignes</Badge></div><Table rows={rows} columns={columns}/></section></div>}

@@ -1,0 +1,1 @@
+export default function Select({ label, options = [], className = "", ...props }) { return <label className={`field ${className}`}><span>{label}</span><select {...props}>{options.map((option) => <option key={option.value ?? option} value={option.value ?? option}>{option.label ?? option}</option>)}</select></label>; }

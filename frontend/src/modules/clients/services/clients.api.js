@@ -1,0 +1,1 @@
+import{get,post,patch}from"../../../services/api";export const listClients=()=>get("/clients?limit=100");export const createClient=data=>post("/clients",data);export const updateClient=(id,data)=>patch(`/clients/${id}`,data);
