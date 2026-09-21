@@ -56,3 +56,5 @@ Les identifiants de demonstration sont crees par le script `seed:operational`. C
 ## Deploiement Render
 
 Le fichier `render.yaml` decrit deux services distincts : un Web Service pour l'API et un Static Site pour React. Les variables privees et la procedure MariaDB sont detaillees dans [docs/deploiement-render.md](docs/deploiement-render.md).
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Sagelusenge/PVC_Systeme)
