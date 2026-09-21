@@ -47,22 +47,22 @@ async function update(id, data) {
 }
 
 async function listRoles() {
-  return query("SELECT id, nom_role, description FROM troles ORDER BY nom_role");
+  return query("SELECT id, nom_role, description, statut FROM troles ORDER BY nom_role");
 }
 
 async function findRoleById(id) {
-  const rows = await query("SELECT id, nom_role, description FROM troles WHERE id=? LIMIT 1", [id]);
+  const rows = await query("SELECT id, nom_role, description, statut FROM troles WHERE id=? LIMIT 1", [id]);
   return rows[0] || null;
 }
 
 async function createRole(data) {
-  const result = await query("INSERT INTO troles (nom_role,description) VALUES (?,?)", [data.nom_role, data.description || null]);
+  const result = await query("INSERT INTO troles (nom_role,description,statut) VALUES (?,?,?)", [data.nom_role, data.description || null, data.statut || "Actif"]);
   return findRoleById(result.insertId);
 }
 
 async function updateRole(id, data) {
   const fields = []; const values = [];
-  for (const key of ["nom_role", "description"]) {
+  for (const key of ["nom_role", "description", "statut"]) {
     if (data[key] !== undefined) { fields.push(`\`${key}\`=?`); values.push(data[key]); }
   }
   if (fields.length) await query(`UPDATE troles SET ${fields.join(",")} WHERE id=?`, [...values, id]);

@@ -161,6 +161,11 @@ a { color: inherit; text-decoration: none; }
 .search input, .field input, .field select, .field textarea { width: 100%; border: 1px solid #31405a; background: #0d1729; color: var(--text); border-radius: 3px; outline: none; }
 .search input { height: 34px; padding: 0 10px 0 34px; font-size: 12px; }
 .search input:focus, .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+.password-field { position: relative; display: block; }
+.password-field input { padding-right: 42px; }
+.password-toggle { position: absolute; top: 2px; right: 2px; width: 34px; height: 34px; display: grid; place-items: center; border: 0; background: transparent; color: var(--muted); border-radius: 2px; }
+.password-toggle:hover { background: var(--surface-3); color: var(--text); }
+.password-toggle svg { width: 17px; height: 17px; }
 
 .data-table-wrap { overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; min-width: 720px; }

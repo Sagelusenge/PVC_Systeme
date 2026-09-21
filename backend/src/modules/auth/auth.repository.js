@@ -2,7 +2,7 @@ const { query } = require("../../config/database");
 
 async function findByUsername(username) {
   const rows = await query(
-    `SELECT u.*, r.nom_role, r.description AS role_description
+    `SELECT u.*, r.nom_role, r.description AS role_description, r.statut AS role_statut
      FROM tutilisateurs u
      LEFT JOIN troles r ON r.id = u.role_id
      WHERE u.nom_utilisateur = ? LIMIT 1`,
@@ -17,7 +17,7 @@ async function updatePassword(id, passwordHash) {
 
 async function findById(id) {
   const rows = await query(
-    `SELECT u.*, r.nom_role, r.description AS role_description
+    `SELECT u.*, r.nom_role, r.description AS role_description, r.statut AS role_statut
      FROM tutilisateurs u
      LEFT JOIN troles r ON r.id = u.role_id
      WHERE u.id = ? LIMIT 1`,

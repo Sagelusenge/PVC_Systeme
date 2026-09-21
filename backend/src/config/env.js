@@ -23,6 +23,7 @@ const env = {
     password: process.env.DB_PASSWORD || "",
     database: process.env.DB_NAME || "db_pvc_renovee",
     connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
+    connectTimeout: Number(process.env.DB_CONNECT_TIMEOUT || 10000),
     ssl: toBoolean(process.env.DB_SSL)
       ? { rejectUnauthorized: toBoolean(process.env.DB_SSL_REJECT_UNAUTHORIZED, true) }
       : undefined,

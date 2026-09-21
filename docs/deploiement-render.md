@@ -7,7 +7,7 @@ Le fichier `render.yaml` cree deux services independants depuis le meme depot Gi
 
 ## Prerequis MariaDB
 
-La base configuree sur `localhost` n'est pas accessible depuis Render. Il faut utiliser une instance MariaDB publique ou privee joignable depuis Render, puis y importer `database/schema/db_pvc.sql`, les migrations et, si necessaire, la sauvegarde de production.
+La base de test Aiven est deja chargee avec le schema, les migrations et les donnees operationnelles. Le Blueprint contient son hote, son port, son utilisateur et le nom `defaultdb`. Seul le mot de passe reste une variable privee a saisir dans Render.
 
 Ne placez jamais les identifiants de la base dans Git. Renseignez-les uniquement dans les variables d'environnement Render.
 
@@ -21,7 +21,7 @@ Ne placez jamais les identifiants de la base dans Git. Renseignez-les uniquement
 | `DB_PASSWORD` | Mot de passe de l'utilisateur |
 | `DB_NAME` | Nom de la base importee |
 | `DB_SSL` | `true` si l'hebergeur impose TLS |
-| `DB_SSL_REJECT_UNAUTHORIZED` | `true` avec un certificat valide |
+| `DB_SSL_REJECT_UNAUTHORIZED` | `false` pour le test Aiven sans CA, puis `true` des que le certificat CA est configure |
 | `CORS_ORIGIN` | URL HTTPS du Static Site, sans barre finale |
 
 `JWT_SECRET` est genere automatiquement par Render.
@@ -36,12 +36,11 @@ Exemple : `https://pvc-systeme-api.onrender.com/api`.
 
 ## Ordre de mise en ligne
 
-1. Importer la base dans une MariaDB distante.
-2. Dans Render, creer un Blueprint depuis le depot `Sagelusenge/PVC_Systeme`.
-3. Fournir les variables marquees comme privees dans le formulaire du Blueprint.
-4. Attendre que le Web Service reponde sur `/api/health`.
-5. Reporter l'URL exacte de l'API dans `VITE_API_URL`.
-6. Reporter l'URL exacte du Static Site dans `CORS_ORIGIN`, puis redeployer l'API.
-7. Verifier `/login`, la connexion et une operation de lecture/ecriture.
+1. Dans Render, creer un Blueprint depuis le depot `Sagelusenge/PVC_Systeme`.
+2. Fournir `DB_PASSWORD`, `CORS_ORIGIN` et `VITE_API_URL` dans le formulaire du Blueprint.
+3. Attendre que le Web Service reponde sur `/api/health`.
+4. Reporter l'URL exacte de l'API dans `VITE_API_URL`.
+5. Reporter l'URL exacte du Static Site dans `CORS_ORIGIN`, puis redeployer l'API.
+6. Verifier `/login`, la connexion et une operation de lecture/ecriture.
 
 Le rewrite `/*` vers `/index.html` est deja configure pour que les routes React restent accessibles apres actualisation.

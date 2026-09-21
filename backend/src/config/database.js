@@ -8,6 +8,7 @@ const pool = mariadb.createPool({
   password: env.db.password,
   database: env.db.database,
   connectionLimit: env.db.connectionLimit,
+  connectTimeout: env.db.connectTimeout,
   ssl: env.db.ssl,
   decimalAsNumber: true,
   insertIdAsNumber: true,

@@ -17,21 +17,23 @@ services:
       - key: JWT_EXPIRES_IN
         value: 1d
       - key: DB_HOST
-        sync: false
+        value: pvcservice-klsage01-68e6.f.aivencloud.com
       - key: DB_PORT
-        value: "3306"
+        value: "21315"
       - key: DB_USER
-        sync: false
+        value: avnadmin
       - key: DB_PASSWORD
         sync: false
       - key: DB_NAME
-        sync: false
+        value: defaultdb
       - key: DB_CONNECTION_LIMIT
         value: "10"
+      - key: DB_CONNECT_TIMEOUT
+        value: "15000"
       - key: DB_SSL
         value: "true"
       - key: DB_SSL_REJECT_UNAUTHORIZED
-        value: "true"
+        value: "false"
       - key: CORS_ORIGIN
         sync: false
 

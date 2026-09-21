@@ -16,7 +16,8 @@ const entryFields = {
 };
 
 module.exports = {
-  createProduct: Joi.object({ ...productFields, code: productFields.code.required(), libelle: productFields.libelle.required(), prix_unitaire: productFields.prix_unitaire.required() }),
+  createProduct: Joi.object({ ...productFields, libelle: productFields.libelle.required(), prix_unitaire: productFields.prix_unitaire.required() }),
   updateProduct: Joi.object(productFields).min(1),
   createEntry: Joi.object({ ...entryFields, id_produit_fini: entryFields.id_produit_fini.required(), quantite_entree: entryFields.quantite_entree.required() }),
+  updateEntry: Joi.object(entryFields).min(1),
 };

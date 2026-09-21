@@ -16,7 +16,7 @@ const createSchema = Joi.object({
   role_id: fields.role_id.required(),
 });
 const updateSchema = Joi.object(fields).min(1);
-const roleSchema = Joi.object({ nom_role: Joi.string().trim().min(2).max(50).required(), description: Joi.string().trim().max(255).allow(null, "") });
-const updateRoleSchema = Joi.object({ nom_role: Joi.string().trim().min(2).max(50), description: Joi.string().trim().max(255).allow(null, "") }).min(1);
+const roleSchema = Joi.object({ nom_role: Joi.string().trim().min(2).max(50).required(), description: Joi.string().trim().max(255).allow(null, ""), statut: Joi.string().valid("Actif", "Inactif").default("Actif") });
+const updateRoleSchema = Joi.object({ nom_role: Joi.string().trim().min(2).max(50), description: Joi.string().trim().max(255).allow(null, ""), statut: Joi.string().valid("Actif", "Inactif") }).min(1);
 
 module.exports = { createSchema, updateSchema, roleSchema, updateRoleSchema };

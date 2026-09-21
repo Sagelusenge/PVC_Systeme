@@ -1,5 +1,5 @@
 const createCrudRepository = require("../../shared/crud.repository");
-const { withTransaction } = require("../../config/database");
+const { query, withTransaction } = require("../../config/database");
 
 const products = createCrudRepository({
   table: "tproduitfini",
@@ -22,4 +22,13 @@ async function createEntry(data) {
   });
 }
 
-module.exports = { products, entries, createEntry };
+async function nextProductCode() {
+  const rows = await query("SELECT code FROM tproduitfini");
+  const highest = rows.reduce((max, row) => {
+    const match = String(row.code || "").match(/^PF-(\d+)$/i);
+    return match ? Math.max(max, Number(match[1])) : max;
+  }, 0);
+  return `PF-${String(highest + 1).padStart(4, "0")}`;
+}
+
+module.exports = { products, entries, createEntry, nextProductCode };

@@ -13,7 +13,7 @@ async function authMiddleware(req, res, next) {
 
     const payload = verifyToken(token);
     const rows = await query(
-      `SELECT u.id, u.nom_utilisateur, u.email, u.photo_url, u.statut, u.role_id, r.nom_role
+      `SELECT u.id, u.nom_utilisateur, u.email, u.photo_url, u.statut, u.role_id, r.nom_role, r.statut AS role_statut
        FROM tutilisateurs u
        LEFT JOIN troles r ON r.id = u.role_id
        WHERE u.id = ? LIMIT 1`,
@@ -23,6 +23,9 @@ async function authMiddleware(req, res, next) {
     const user = rows[0];
     if (!user || user.statut !== "Actif") {
       throw new ApiError(401, "Compte utilisateur invalide ou inactif");
+    }
+    if (user.role_statut === "Inactif") {
+      throw new ApiError(403, "Le role de ce compte est bloque");
     }
 
     req.user = user;

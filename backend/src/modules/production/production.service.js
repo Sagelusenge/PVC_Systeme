@@ -3,6 +3,8 @@ const createCrudService = require("../../shared/crud.service");
 const ApiError = require("../../utils/ApiError");
 
 const products = createCrudService(repository.products, "Produit fini");
+const createProduct = products.create;
+products.create = async (data) => createProduct({ ...data, code: data.code || await repository.nextProductCode() });
 const entries = createCrudService(repository.entries, "Entree de production");
 entries.create = async (data) => {
   const entry = await repository.createEntry(data);

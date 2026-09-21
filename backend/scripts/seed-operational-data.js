@@ -174,7 +174,11 @@ async function run() {
   const roleRows = await db.query("SELECT id, nom_role FROM troles");
   const roleIds = Object.fromEntries(roleRows.map((role) => [role.nom_role, role.id]));
   const sharedPassword = await hashPassword("password");
-  await db.query("UPDATE tutilisateurs SET mot_de_passe=? WHERE nom_utilisateur IN ('Lus','sagelusenge@gmail.com')", [sharedPassword]);
+  await db.query(
+    "UPDATE tutilisateurs SET nom_utilisateur='sagelusenge@gmail.com', email='sagelusenge@gmail.com', mot_de_passe=?, statut='Actif', role_id=? WHERE nom_utilisateur='Lus'",
+    [sharedPassword, roleIds.Administrateur]
+  );
+  await ensure("tutilisateurs", { nom_utilisateur: "sagelusenge@gmail.com" }, { email: "sagelusenge@gmail.com", mot_de_passe: sharedPassword, statut: "Actif", role_id: roleIds.Administrateur });
   const roleUsers = [
     ["comptable@gmail.com", "Comptable"],
     ["caissier@gmail.com", "Caissier"],

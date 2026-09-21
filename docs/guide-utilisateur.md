@@ -19,6 +19,8 @@ Ce guide decrit les actions disponibles pour chaque acteur. Une version interact
 - **Nouveau role** : cree un nouveau profil d'acces.
 - **Crayon role** : modifie le nom ou la description du role.
 - **Corbeille role** : supprime un role non utilise.
+- **Bloquer utilisateur** : suspend le compte sans supprimer son historique.
+- **Bloquer role** : bloque tous les comptes rattaches jusqu'a la reactivation.
 
 ## Direction
 
@@ -51,10 +53,14 @@ Ce guide decrit les actions disponibles pour chaque acteur. Une version interact
 - **Personnel** : affiche les collaborateurs.
 - **Presences** : affiche les pointages.
 - **Paie** : consulte les postes et salaires.
+- **Nouveau pointage** : enregistre l'arrivee d'un agent puis permet de pointer sa sortie.
+- **Creer une paie** : calcule le net et enregistre le paiement mensuel.
+- **Bulletin PDF** : telecharge le detail individuel de la paie.
 
 ## Commercial
 
 - **Fichier Clients** : consulte ou cree les clients.
+- **Fiche client PDF** : exporte les informations, ventes et paiements du client.
 - **Nouvelle vente** : enregistre une vente de produit fini.
 - **Encaisser reglement** : ajoute un paiement.
 - **Commandes Clients** : consulte les commandes.
@@ -78,6 +84,8 @@ Ce guide decrit les actions disponibles pour chaque acteur. Une version interact
 
 - **Production & Extrusion** : consulte les produits finis et les lots.
 - **Nouveau produit** : cree une reference de produit fini.
+- **Code automatique** : attribue le prochain code disponible au format `PF-0001`.
+- **Etat PDF** : exporte le stock fini et sa valorisation.
 - **Declarer production** : augmente le stock apres fabrication.
 - **Matieres & Reappro** : consulte les matieres disponibles.
 
@@ -94,3 +102,7 @@ Ce guide decrit les actions disponibles pour chaque acteur. Une version interact
 - **Grand livre analytique** : verifie les soldes par sous-compte.
 - **Balance et Bilan** : analyse les etats financiers.
 - **Rapports** : consulte les syntheses disponibles.
+
+## Etats PDF
+
+Les boutons **PDF / Imprimer** et **Etat PDF** generent les journaux, grands livres, balances, bilans, rapports, produits finis, fiches clients, presences, personnel, journaux de paie et bulletins individuels. Chaque fichier contient un titre, une date de generation et une pagination.

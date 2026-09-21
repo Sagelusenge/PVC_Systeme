@@ -51,19 +51,23 @@ async function setupDatabase() {
     port: env.db.port,
     user: env.db.user,
     password: env.db.password,
+    connectTimeout: env.db.connectTimeout,
     ssl: env.db.ssl,
     multipleStatements: false,
   });
 
   try {
     await adminConnection.query(
-      `CREATE DATABASE IF NOT EXISTS ${escapeIdentifier(env.db.database)} CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci`
+      `CREATE DATABASE IF NOT EXISTS ${escapeIdentifier(env.db.database)} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
     );
   } finally {
     await adminConnection.end();
   }
 
-  const schemaSql = fs.readFileSync(schemaPath, "utf8");
+  const schemaSql = fs
+    .readFileSync(schemaPath, "utf8")
+    .replaceAll("utf8mb4_uca1400_ai_ci", "utf8mb4_unicode_ci")
+    .replace(/DEFINER\s*=\s*'[^']+'@'[^']+'/gi, "");
   const statements = splitSqlStatements(schemaSql);
 
   const dbConnection = await mariadb.createConnection({
@@ -72,12 +76,15 @@ async function setupDatabase() {
     user: env.db.user,
     password: env.db.password,
     database: env.db.database,
+    connectTimeout: env.db.connectTimeout,
     ssl: env.db.ssl,
     multipleStatements: false,
   });
 
   try {
     for (const statement of statements) {
+      const executable = statement.replace(/^\s*(?:--[^\r\n]*(?:\r?\n|$)\s*)+/, "").trim();
+      if (/^USE\s+/i.test(executable)) continue;
       await dbConnection.query(statement);
     }
   } finally {

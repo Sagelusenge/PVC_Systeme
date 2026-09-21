@@ -7,4 +7,6 @@ module.exports = {
   retenues: crud(s.retenues, "Retenue"), agentRetenues: crud(s.agentRetenues, "Retenue agent"), avantages: crud(s.avantages, "Avantage"),
   agentAvantages: crud(s.agentAvantages, "Avantage agent"), joursFeries: crud(s.joursFeries, "Jour ferie"),
   payroll: async (req, res) => success(res, await s.payroll()),
+  payrollPayments: crud(s.payrollPayments, "Paiement de salaire"),
+  createPayroll: async (req, res) => success(res, await s.createPayroll(req.body), "Paie enregistree", 201),
 };

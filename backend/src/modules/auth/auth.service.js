@@ -14,6 +14,7 @@ async function login({ nom_utilisateur, mot_de_passe }) {
     throw new ApiError(401, "Nom d'utilisateur ou mot de passe incorrect");
   }
   if (user.statut !== "Actif") throw new ApiError(403, "Ce compte est inactif");
+  if (user.role_statut === "Inactif") throw new ApiError(403, "Ce role est bloque par l'administrateur");
 
   if (!isBcryptHash(user.mot_de_passe)) {
     await repository.updatePassword(user.id, await hashPassword(mot_de_passe));
