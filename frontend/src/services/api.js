@@ -1,4 +1,6 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? "https://pvc-systeme-api.onrender.com/api" : "http://localhost:5000/api");
 
 export async function api(path, options = {}) {
   const token = localStorage.getItem("pvc_token");
