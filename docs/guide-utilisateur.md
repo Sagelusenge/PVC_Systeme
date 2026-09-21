@@ -1,6 +1,6 @@
 # Guide utilisateur PVC Systeme
 
-Ce guide decrit les actions disponibles pour chaque acteur. Une version interactive est accessible dans l'application avec le bouton **Guide d'utilisation**, place en bas du menu lateral.
+Ce guide decrit les actions disponibles pour chaque acteur. Une version interactive est accessible dans l'application avec le bouton **Guide d'utilisation**, place en bas du menu lateral. Dans cette page, cliquez sur une rubrique comme **Tableau de Bord** ou **Utilisateurs** pour afficher son contenu, sa fonction et sa procedure. L'ouverture d'une nouvelle rubrique referme automatiquement la precedente.
 
 ## Commandes communes
 

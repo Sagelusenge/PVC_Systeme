@@ -51,6 +51,7 @@ async function setupDatabase() {
     port: env.db.port,
     user: env.db.user,
     password: env.db.password,
+    ssl: env.db.ssl,
     multipleStatements: false,
   });
 
@@ -71,6 +72,7 @@ async function setupDatabase() {
     user: env.db.user,
     password: env.db.password,
     database: env.db.database,
+    ssl: env.db.ssl,
     multipleStatements: false,
   });
 
