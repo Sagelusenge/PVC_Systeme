@@ -34,4 +34,11 @@ async function createWithDetails(data) {
   });
 }
 
-module.exports = { ...base, findDetailed, createWithDetails };
+async function remove(id) {
+  return withTransaction(async (connection) => {
+    await connection.query("DELETE FROM tdetails_commandeclient WHERE id_commande = ?", [id]);
+    return base.remove(id, connection);
+  });
+}
+
+module.exports = { ...base, findDetailed, createWithDetails, remove };
