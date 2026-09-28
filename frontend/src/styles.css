@@ -134,6 +134,7 @@ a { color: inherit; text-decoration: none; }
 .row-actions { display: flex; align-items: center; gap: 4px; }
 .table-action { width: 30px; height: 30px; border-color: var(--line); background: var(--surface-3); }
 .table-action.danger { color: var(--red); }
+.table-action.success { color: var(--green); }
 .guide-role-tabs { flex-wrap: wrap; }
 .guide-list { display: flex; flex-direction: column; }
 .guide-row { border-bottom: 1px solid var(--line); background: var(--surface); transition: background .18s ease; }
@@ -196,6 +197,7 @@ a { color: inherit; text-decoration: none; }
 .field input, .field select { height: 38px; padding: 0 10px; }
 .field textarea { min-height: 84px; padding: 10px; resize: vertical; }
 .form-error { padding: 9px 10px; border: 1px solid #9f2d3b; background: #481722; color: #ffb6b6; border-radius: 3px; font-size: 11px; }
+.form-success { padding: 9px 10px; border: 1px solid #2d9c78; background: #123e34; color: #9af0cf; border-radius: 3px; font-size: 11px; }
 .toast { position: fixed; right: 18px; bottom: 18px; z-index: 120; padding: 12px 15px; background: #123e34; border: 1px solid #2d9c78; color: #8bf0c9; border-radius: 4px; font-size: 12px; }
 
 .error-state { min-height: calc(100vh - 112px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 32px; animation: pageEnter .3s ease-out both; }

@@ -44,3 +44,9 @@ Exemple : `https://pvc-systeme-api.onrender.com/api`.
 6. Verifier `/login`, la connexion et une operation de lecture/ecriture.
 
 Le rewrite `/*` vers `/index.html` est deja configure pour que les routes React restent accessibles apres actualisation.
+
+## Migrations automatiques
+
+Le demarrage du backend execute `npm start`, qui lance d'abord `scripts/migrateDatabase.js`, puis le serveur Express. Chaque migration deja enregistree dans `tschema_migrations` est ignoree. Ainsi, chaque redeploiement Render applique uniquement les nouveaux fichiers de `database/migrations` avant d'accepter le trafic.
+
+Avant une migration manuelle importante, creer une sauvegarde avec `npm run db:backup`. Les fichiers SQL de sauvegarde contiennent le schema et les donnees, et restent exclus de Git.

@@ -40,6 +40,8 @@ npm run db:setup
 npm run dev
 ```
 
+En production, `npm start` applique automatiquement les nouvelles migrations enregistrees dans `database/migrations`, puis demarre l'API. Les migrations deja inscrites dans `tschema_migrations` ne sont pas rejouees.
+
 Verification avant demarrage :
 
 ```bash

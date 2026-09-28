@@ -30,6 +30,7 @@ export default function ClientsPage() {
   const submit = async () => {
     try {
       const payload = { ...form, solde_compte: Number(form.solde_compte || 0) };
+      if (!payload.code) delete payload.code;
       if (selectedId) await updateClient(selectedId, payload); else await createClient(payload);
       setOpen(false); await state.refresh();
     } catch (err) { setError(err.message); }
@@ -58,15 +59,15 @@ export default function ClientsPage() {
     { key: "adresse", label: "Adresse" }, { key: "conditions_paiement", label: "Conditions" },
     { key: "solde_compte", label: "Solde", numeric: true, render: (value) => <span style={{ color: Number(value) > 0 ? "var(--orange)" : "var(--green)" }}>{formatCurrency(value)}</span> },
     { key: "etat", label: "Compte", render: (_, row) => <Badge tone={Number(row.solde_compte)>0?"orange":"green"}>{Number(row.solde_compte)>0?"Debiteur":"A jour"}</Badge> },
-    { key: "actions", label: "Actions", render: (_, row) => <div className="row-actions"><button className="icon-btn table-action" title="Fiche PDF" onClick={() => clientPdf(row)}><FileDown /></button><button className="icon-btn table-action" title="Modifier" onClick={() => openForm(row)}><Pencil /></button>{user?.nom_role === "Direction" && <button className="icon-btn table-action danger" title="Supprimer" onClick={() => removeClient(row)}><Trash2 /></button>}</div> },
+    { key: "actions", label: "Actions", render: (_, row) => <div className="row-actions"><button className="icon-btn table-action" title="Imprimer la fiche" onClick={() => clientPdf(row)}><FileDown /></button><button className="icon-btn table-action" title="Modifier" onClick={() => openForm(row)}><Pencil /></button>{["Direction", "Administrateur"].includes(user?.nom_role) && <button className="icon-btn table-action danger" title="Supprimer" onClick={() => removeClient(row)}><Trash2 /></button>}</div> },
   ];
   return <div className="page">
-    <header className="page-header"><div><span className="eyebrow">Relation commerciale // tclient</span><h1>Fichier Clients</h1><p>Comptes, conditions de paiement et creances commerciales.</p></div><div className="page-actions"><Button icon={FileDown} onClick={allClientsPdf}>Etat PDF</Button><Button variant="primary" icon={Plus} onClick={() => openForm()}>Nouveau client</Button></div></header>
+    <header className="page-header"><div><span className="eyebrow">Suivi commercial</span><h1>Clients</h1><p>Coordonnées, conditions de paiement et montants à recouvrer.</p></div><div className="page-actions"><Button icon={FileDown} onClick={allClientsPdf}>Imprimer la liste</Button><Button variant="primary" icon={Plus} onClick={() => openForm()}>Nouveau client</Button></div></header>
     {error && <div className="form-error">{error}</div>}
     <section className="metrics"><StatCard label="Clients enregistres" value={clients.length} detail="Comptes commerciaux" icon={UsersRound}/><StatCard label="Solde a recouvrer" value={formatCurrency(solde)} detail="Creances cumulees" icon={CircleDollarSign} tone={solde>0?"orange":"green"}/><StatCard label="Comptes a jour" value={clients.filter(row=>Number(row.solde_compte)===0).length} detail="Sans creance" icon={ContactRound} tone="green"/><StatCard label="Comptes debiteurs" value={clients.filter(row=>Number(row.solde_compte)>0).length} detail="Suivi necessaire" icon={CircleDollarSign} tone="red"/></section>
-    <section className="panel"><div className="panel-head"><h2>Registre des clients</h2><Badge>tclient</Badge></div><Table rows={clients} columns={cols}/></section>
+    <section className="panel"><div className="panel-head"><h2>Liste des clients</h2><Badge>{clients.length} client(s)</Badge></div><Table rows={clients} columns={cols}/></section>
     <Modal open={open} title={selectedId ? "Modifier le client" : "Nouveau client"} onClose={() => setOpen(false)} footer={<><Button onClick={() => setOpen(false)}>Annuler</Button><Button variant="primary" onClick={submit}>Enregistrer</Button></>}>
-      {error && <div className="form-error">{error}</div>}<div className="form-grid" style={{marginTop:12}}><Input label="Code client" value={form.code||""} onChange={event=>setForm({...form,code:event.target.value})}/><Input label="Raison sociale" value={form.raison_sociale||""} onChange={event=>setForm({...form,raison_sociale:event.target.value})}/><Input className="full" label="Adresse" value={form.adresse||""} onChange={event=>setForm({...form,adresse:event.target.value})}/><Input label="Conditions de paiement" value={form.conditions_paiement||""} onChange={event=>setForm({...form,conditions_paiement:event.target.value})}/></div>
+      {error && <div className="form-error">{error}</div>}<div className="form-grid" style={{marginTop:12}}><Input label="Code automatique" value={form.code || "Créé après enregistrement"} disabled={!selectedId} onChange={event=>setForm({...form,code:event.target.value})}/><Input label="Nom ou raison sociale" value={form.raison_sociale||""} onChange={event=>setForm({...form,raison_sociale:event.target.value})}/><Input className="full" label="Adresse" value={form.adresse||""} onChange={event=>setForm({...form,adresse:event.target.value})}/><Input label="Conditions de paiement" value={form.conditions_paiement||""} onChange={event=>setForm({...form,conditions_paiement:event.target.value})}/></div>
     </Modal>
   </div>;
 }

@@ -1,6 +1,17 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
+const BRAND = {
+  name: "PVC Renovee",
+  activity: "Industrie PVC et gestion integree",
+  location: "Lubumbashi, Republique democratique du Congo",
+  primary: [8, 17, 35],
+  accent: [45, 107, 234],
+  green: [39, 190, 151],
+};
+
+let logoPromise;
+
 function printable(value) {
   if (value === null || value === undefined || value === "") return "-";
   if (value instanceof Date) return value.toLocaleString("fr-FR");
@@ -9,54 +20,161 @@ function printable(value) {
   return String(value);
 }
 
-export function exportTablePdf({ title, subtitle = "", columns, rows, filename, orientation = "landscape", summary = [] }) {
-  const doc = new jsPDF({ orientation, unit: "mm", format: "a4" });
-  doc.setFillColor(8, 17, 35);
-  doc.rect(0, 0, doc.internal.pageSize.getWidth(), 28, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(16);
-  doc.text("PVC Renovee", 14, 11);
-  doc.setFontSize(11);
-  doc.text(title, 14, 20);
-  doc.setTextColor(70, 78, 92);
-  doc.setFontSize(8);
-  doc.text(subtitle || `Genere le ${new Date().toLocaleString("fr-FR")}`, 14, 34);
-
-  let startY = 40;
-  if (summary.length) {
-    summary.forEach(([label, value], index) => {
-      const x = 14 + (index % 3) * 62;
-      const y = startY + Math.floor(index / 3) * 8;
-      doc.setFont(undefined, "bold");
-      doc.text(`${label} :`, x, y);
-      doc.setFont(undefined, "normal");
-      doc.text(printable(value), x + 24, y);
-    });
-    startY += Math.ceil(summary.length / 3) * 8 + 3;
+function loadLogo() {
+  if (!logoPromise) {
+    logoPromise = fetch(`${import.meta.env.BASE_URL}pvc-logo.png`)
+      .then((response) => response.blob())
+      .then((blob) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      }))
+      .catch(() => null);
   }
+  return logoPromise;
+}
+
+function drawHeader(doc, { logo, title, documentNumber }) {
+  const width = doc.internal.pageSize.getWidth();
+  doc.setFillColor(...BRAND.primary);
+  doc.rect(0, 0, width, 34, "F");
+  if (logo) doc.addImage(logo, "PNG", 13, 7, 20, 20, undefined, "FAST");
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(15);
+  doc.text(BRAND.name, logo ? 38 : 14, 14);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.text(BRAND.activity, logo ? 38 : 14, 20);
+  doc.text(BRAND.location, logo ? 38 : 14, 25);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text(title, width - 14, 14, { align: "right" });
+  if (documentNumber) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text(`Reference : ${documentNumber}`, width - 14, 21, { align: "right" });
+  }
+  doc.setFillColor(...BRAND.green);
+  doc.rect(0, 34, width, 1.4, "F");
+}
+
+function drawFooter(doc, page, pageCount) {
+  const width = doc.internal.pageSize.getWidth();
+  const height = doc.internal.pageSize.getHeight();
+  doc.setDrawColor(211, 218, 230);
+  doc.line(14, height - 12, width - 14, height - 12);
+  doc.setTextColor(92, 102, 120);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7);
+  doc.text(`${BRAND.name} | Document genere par PVC Systeme`, 14, height - 7);
+  doc.text(`Page ${page}/${pageCount}`, width - 14, height - 7, { align: "right" });
+}
+
+function drawInformation(doc, { subtitle, recipient, generatedAt, startY = 42 }) {
+  const width = doc.internal.pageSize.getWidth();
+  doc.setTextColor(49, 58, 74);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.text(subtitle || "Document officiel", 14, startY);
+  doc.text(`Date d'edition : ${generatedAt}`, width - 14, startY, { align: "right" });
+  if (!recipient) return startY + 7;
+  doc.setFillColor(245, 247, 251);
+  doc.setDrawColor(218, 224, 234);
+  doc.roundedRect(14, startY + 4, width - 28, 18, 1.5, 1.5, "FD");
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...BRAND.primary);
+  doc.text(recipient.title || "Destinataire", 18, startY + 10);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(70, 78, 92);
+  doc.text([recipient.name, recipient.details].filter(Boolean).join(" | "), 18, startY + 16, { maxWidth: width - 36 });
+  return startY + 28;
+}
+
+function drawSummary(doc, summary, startY) {
+  if (!summary.length) return startY;
+  const width = doc.internal.pageSize.getWidth();
+  const gap = 4;
+  const count = Math.min(summary.length, 4);
+  const boxWidth = (width - 28 - gap * (count - 1)) / count;
+  summary.slice(0, 4).forEach(([label, value], index) => {
+    const x = 14 + index * (boxWidth + gap);
+    doc.setFillColor(245, 247, 251);
+    doc.setDrawColor(218, 224, 234);
+    doc.roundedRect(x, startY, boxWidth, 16, 1.5, 1.5, "FD");
+    doc.setTextColor(92, 102, 120);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6.5);
+    doc.text(String(label).toUpperCase(), x + 3, startY + 5);
+    doc.setTextColor(...BRAND.primary);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text(printable(value), x + 3, startY + 12, { maxWidth: boxWidth - 6 });
+  });
+  return startY + 22;
+}
+
+export async function exportTablePdf({
+  title, subtitle = "", columns, rows, filename, orientation = "landscape", summary = [],
+  documentNumber = "", recipient = null, notes = "", signatures = false,
+}) {
+  const doc = new jsPDF({ orientation, unit: "mm", format: "a4" });
+  const logo = await loadLogo();
+  const generatedAt = new Date().toLocaleString("fr-FR");
+  drawHeader(doc, { logo, title, documentNumber });
+  let startY = drawInformation(doc, { subtitle, recipient, generatedAt });
+  startY = drawSummary(doc, summary, startY);
 
   autoTable(doc, {
     startY,
     head: [columns.map((column) => column.label)],
     body: rows.map((row) => columns.map((column) => printable(column.value ? column.value(row) : row[column.key]))),
     theme: "grid",
-    styles: { fontSize: 7, cellPadding: 2, overflow: "linebreak" },
-    headStyles: { fillColor: [45, 107, 234], textColor: 255 },
-    alternateRowStyles: { fillColor: [242, 245, 250] },
-    margin: { left: 14, right: 14 },
+    styles: { fontSize: 7.5, cellPadding: 2.4, overflow: "linebreak", textColor: [49, 58, 74], lineColor: [218, 224, 234], lineWidth: 0.15 },
+    headStyles: { fillColor: BRAND.accent, textColor: 255, fontStyle: "bold", halign: "left" },
+    alternateRowStyles: { fillColor: [247, 249, 252] },
+    margin: { left: 14, right: 14, top: 42, bottom: 18 },
+    willDrawPage: () => drawHeader(doc, { logo, title, documentNumber }),
   });
+
+  let finalY = (doc.lastAutoTable?.finalY || startY) + 8;
+  const pageHeight = doc.internal.pageSize.getHeight();
+  if ((notes || signatures) && finalY > pageHeight - 42) {
+    doc.addPage();
+    drawHeader(doc, { logo, title, documentNumber });
+    finalY = 46;
+  }
+  if (notes) {
+    doc.setTextColor(70, 78, 92);
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(8);
+    doc.text(notes, 14, finalY, { maxWidth: doc.internal.pageSize.getWidth() - 28 });
+    finalY += 14;
+  }
+  if (signatures) {
+    const width = doc.internal.pageSize.getWidth();
+    doc.setDrawColor(150, 160, 176);
+    doc.line(20, finalY + 16, 78, finalY + 16);
+    doc.line(width - 78, finalY + 16, width - 20, finalY + 16);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text("Responsable", 49, finalY + 21, { align: "center" });
+    doc.text("Client / Beneficiaire", width - 49, finalY + 21, { align: "center" });
+  }
 
   const pageCount = doc.getNumberOfPages();
   for (let page = 1; page <= pageCount; page += 1) {
     doc.setPage(page);
-    doc.setFontSize(7);
-    doc.setTextColor(110, 118, 132);
-    doc.text(`PVC Renovee - Page ${page}/${pageCount}`, 14, doc.internal.pageSize.getHeight() - 7);
+    drawFooter(doc, page, pageCount);
   }
   doc.save(filename || `${title.toLowerCase().replace(/[^a-z0-9]+/gi, "-")}.pdf`);
 }
 
-export function reportColumns(rows) {
+export function reportColumns(rows, labels = {}) {
   if (!rows.length) return [];
-  return Object.keys(rows[0]).map((key) => ({ key, label: key.replaceAll("_", " ").toUpperCase() }));
+  return Object.keys(rows[0]).map((key) => ({
+    key,
+    label: labels[key] || key.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
+  }));
 }

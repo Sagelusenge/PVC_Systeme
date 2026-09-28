@@ -65,6 +65,10 @@ Ce guide decrit les actions disponibles pour chaque acteur. Une version interact
 - **Encaisser reglement** : ajoute un paiement.
 - **Commandes Clients** : consulte les commandes.
 - **Nouvelle commande** : enregistre une commande et sa livraison prevue.
+- **Modifier** : corrige une commande encore en attente.
+- **Imprimer** : genere un bon de commande avec le logo, l'en-tete et les zones de signature.
+- **Livrer et facturer** : transforme la commande en facture, retire les produits du stock, prend en compte l'acompte et cree les ecritures comptables sans nouvelle saisie.
+- **Annuler / Supprimer** : annule une commande en attente ou la supprime si elle n'a pas encore ete facturee.
 
 ## Magasinier
 
@@ -85,14 +89,16 @@ Ce guide decrit les actions disponibles pour chaque acteur. Une version interact
 - **Production & Extrusion** : consulte les produits finis et les lots.
 - **Nouveau produit** : cree une reference de produit fini.
 - **Code automatique** : attribue le prochain code disponible au format `PF-0001`.
-- **Etat PDF** : exporte le stock fini et sa valorisation.
+- **Imprimer le stock** : exporte le stock fini et sa valorisation.
 - **Declarer production** : augmente le stock apres fabrication.
 - **Matieres & Reappro** : consulte les matieres disponibles.
 
 ## Responsable immobilisations
 
 - **Parc & Amortissements** : consulte les actifs industriels.
-- **Nouveau materiel** : enregistre un equipement et ses parametres d'amortissement.
+- **Nouveau materiel** : enregistre un equipement et ses parametres d'amortissement. Le code est attribue automatiquement.
+- **Modifier / Supprimer** : corrige un materiel ou le supprime avec confirmation selon les droits du role.
+- **Imprimer le parc** : genere l'etat des immobilisations avec les totaux.
 - **Enregistrer** : cree automatiquement la premiere ligne du plan d'amortissement.
 
 ## Auditeur
@@ -105,4 +111,11 @@ Ce guide decrit les actions disponibles pour chaque acteur. Une version interact
 
 ## Etats PDF
 
-Les boutons **PDF / Imprimer** et **Etat PDF** generent les journaux, grands livres, balances, bilans, rapports, produits finis, fiches clients, presences, personnel, journaux de paie et bulletins individuels. Chaque fichier contient un titre, une date de generation et une pagination.
+Les boutons **PDF / Imprimer** generent les commandes, factures, recus, journaux, grands livres, balances, bilans, rapports, stocks, fiches clients, presences, personnel, journaux de paie et bulletins individuels. Chaque fichier contient le logo de PVC Renovee, un en-tete, une reference si elle existe, la date de generation, les totaux, la pagination et, pour les documents concernes, des zones de signature.
+
+## Automatismes
+
+- Les codes clients, commandes, produits finis, matieres premieres, agents d'achat et materiels sont crees automatiquement.
+- Une commande livree cree automatiquement sa facture, son eventuel paiement initial, la sortie de stock et les ecritures comptables correspondantes.
+- Une vente directe cree automatiquement la facture, met a jour le stock et le solde du client, puis comptabilise la vente.
+- Un paiement met a jour la facture et le client, puis cree son ecriture comptable. Son annulation cree une ecriture inverse.

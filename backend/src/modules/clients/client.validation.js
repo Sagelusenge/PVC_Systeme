@@ -7,7 +7,7 @@ const fields = {
   conditions_paiement: Joi.string().trim().max(100).allow(null, ""),
   solde_compte: Joi.number().precision(2).min(0),
 };
-const createSchema = Joi.object({ ...fields, code: fields.code.required(), raison_sociale: fields.raison_sociale.required() });
+const createSchema = Joi.object({ ...fields, raison_sociale: fields.raison_sociale.required() });
 const updateSchema = Joi.object(fields).min(1);
 
 module.exports = { createSchema, updateSchema };

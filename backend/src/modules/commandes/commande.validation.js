@@ -12,6 +12,6 @@ const fields = {
 };
 
 module.exports = {
-  createSchema: Joi.object({ ...fields, numero: fields.numero.required(), date_commande: fields.date_commande.required(), client_id: fields.client_id.required(), details: Joi.array().items(line).min(1).required() }),
-  updateSchema: Joi.object(fields).min(1),
+  createSchema: Joi.object({ ...fields, date_commande: fields.date_commande.required(), client_id: fields.client_id.required(), details: Joi.array().items(line).min(1).required() }),
+  updateSchema: Joi.object({ ...fields, details: Joi.array().items(line).min(1) }).min(1),
 };

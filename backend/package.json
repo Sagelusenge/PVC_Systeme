@@ -4,7 +4,9 @@
   "description": "Backend API for PVC Management.",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node scripts/migrateDatabase.js && node src/server.js",
+    "start:prod": "npm start",
+    "start:server": "node src/server.js",
     "dev": "nodemon src/server.js",
     "db:check": "node src/config/database.js",
     "db:setup": "node scripts/setupDatabase.js",

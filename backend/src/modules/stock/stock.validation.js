@@ -11,9 +11,9 @@ const buyerFields = {
 };
 
 module.exports = {
-  createMaterial: Joi.object({ ...materialFields, reference: materialFields.reference.required(), designation: materialFields.designation.required() }),
+  createMaterial: Joi.object({ ...materialFields, designation: materialFields.designation.required() }),
   updateMaterial: Joi.object(materialFields).min(1),
-  createBuyer: Joi.object({ ...buyerFields, code: buyerFields.code.required(), nom: buyerFields.nom.required(), postnom: buyerFields.postnom.required(), prenom: buyerFields.prenom.required() }),
+  createBuyer: Joi.object({ ...buyerFields, nom: buyerFields.nom.required(), postnom: buyerFields.postnom.required(), prenom: buyerFields.prenom.required() }),
   updateBuyer: Joi.object(buyerFields).min(1),
   createEntry: Joi.object({ date_entree: Joi.date().iso().required(), matiere_premiere_id: Joi.number().integer().positive().required(), agent_achat_id: Joi.number().integer().positive().allow(null), quantite: Joi.number().positive().required(), unite: Joi.string().max(20), prix_unitaire_entree: Joi.number().min(0).required(), montant_payer: Joi.number().min(0).required() }),
   createExit: Joi.object({ date_sortie: Joi.date().iso().required(), matiere_premiere_id: Joi.number().integer().positive().required(), quantite: Joi.number().positive().required(), unite: Joi.string().max(20), cout_unitaire: Joi.number().min(0) }),

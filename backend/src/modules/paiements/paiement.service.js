@@ -10,8 +10,8 @@ service.create = async (data) => {
   if (result.error === "overpayment") throw new ApiError(422, `Le paiement depasse le reste de ${result.remaining}`);
   return result.payment;
 };
-service.cancel = async (id) => {
-  const result = await repository.cancelPayment(id);
+service.cancel = async (id, user) => {
+  const result = await repository.cancelPayment(id, user);
   if (result.error) throw new ApiError(404, "Paiement introuvable");
   return result.payment;
 };

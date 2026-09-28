@@ -12,4 +12,5 @@ router.get("/materiels/:id", asyncHandler(c.materials.get));
 router.get("/materiels/:id/plan", asyncHandler(c.plan));
 router.post("/materiels", manage, validate(v.create), asyncHandler(c.materials.create));
 router.patch("/materiels/:id", manage, validate(v.update), asyncHandler(c.materials.update));
+router.delete("/materiels/:id", allowRoles("Direction"), asyncHandler(c.materials.remove));
 module.exports = router;

@@ -6,7 +6,7 @@ services:
     region: frankfurt
     rootDir: backend
     buildCommand: npm ci --omit=dev
-    startCommand: npm start
+    startCommand: npm run start:prod
     healthCheckPath: /api/health
     autoDeployTrigger: commit
     envVars:

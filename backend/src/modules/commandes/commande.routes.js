@@ -10,5 +10,6 @@ router.get("/", asyncHandler(controller.list));
 router.get("/:id", asyncHandler(controller.get));
 router.post("/", allowRoles("Commercial", "Direction"), validate(schemas.createSchema), asyncHandler(controller.create));
 router.patch("/:id", allowRoles("Commercial", "Direction"), validate(schemas.updateSchema), asyncHandler(controller.update));
+router.post("/:id/livrer", allowRoles("Commercial", "Direction"), asyncHandler(controller.deliver));
 router.delete("/:id", allowRoles("Direction"), asyncHandler(controller.remove));
 module.exports = router;

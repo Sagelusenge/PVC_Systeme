@@ -7,6 +7,6 @@ const fields = {
   statut: Joi.string().valid("en service", "en maintenance", "hors service", "vendu"), Coefficient_degressif: Joi.string().max(255).allow(null, ""),
 };
 module.exports = {
-  create: Joi.object({ ...fields, code_materiel: fields.code_materiel.required(), designation: fields.designation.required(), date_acquisition: fields.date_acquisition.required(), valeur_acquisition: fields.valeur_acquisition.required(), taux_amortissement: fields.taux_amortissement.required(), mode_amortissement: fields.mode_amortissement.required(), duree_utilisation: fields.duree_utilisation.required() }),
+  create: Joi.object({ ...fields, designation: fields.designation.required(), date_acquisition: fields.date_acquisition.required(), valeur_acquisition: fields.valeur_acquisition.required(), taux_amortissement: fields.taux_amortissement.required(), mode_amortissement: fields.mode_amortissement.required(), duree_utilisation: fields.duree_utilisation.required() }),
   update: Joi.object(fields).min(1),
 };

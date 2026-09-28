@@ -1,5 +1,5 @@
 const createCrudRepository = require("../../shared/crud.repository");
-const { query } = require("../../config/database");
+const { query, withTransaction } = require("../../config/database");
 
 const materials = createCrudRepository({
   table: "tmateriels", idColumn: "id_materiel",
@@ -8,4 +8,10 @@ const materials = createCrudRepository({
 });
 async function plan(id) { return query("SELECT * FROM v_plan_amortissement WHERE id_materiel=? ORDER BY date_calcul", [id]); }
 async function allPlans() { return query("SELECT * FROM v_plan_amortissement ORDER BY date_calcul DESC"); }
-module.exports = { materials, plan, allPlans };
+async function removeMaterial(id) {
+  return withTransaction(async (connection) => {
+    await connection.query("DELETE FROM tplan_amortissements WHERE id_materiel=?", [id]);
+    return materials.remove(id, connection);
+  });
+}
+module.exports = { materials, plan, allPlans, removeMaterial };
