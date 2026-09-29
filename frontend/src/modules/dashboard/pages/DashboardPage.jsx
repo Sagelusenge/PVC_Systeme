@@ -80,6 +80,16 @@ export default function DashboardPage() {
   }, []);
   if (state.loading) return <Loader />;
   const data = state.data?.dashboard || {};
+
+  if (user?.nom_role === "Administrateur") {
+    return <div className="page">
+      <header className="page-header"><div><span className="eyebrow">Vue strategique consolidee</span><h1>Cockpit General & Tresorerie</h1><p>Indicateurs industriels, commerciaux et financiers synchronises en temps reel.</p></div><div className="page-actions"><Button variant="primary" icon={PlusCircle} onClick={() => navigate("/ventes")}>Nouvelle vente PF</Button><Button icon={BookOpenCheck} onClick={() => navigate("/comptabilite/ecritures")}>Ecriture journal</Button></div></header>
+      <section className="metrics"><StatCard label="Ventes produits finis" value={formatCurrency(data.ventes_mois?.chiffre_affaires)} detail={`${data.ventes_mois?.nombre || 0} ventes ce mois`} icon={CircleDollarSign} progress={72}/><StatCard label="Resultat net exploitation" value={formatCurrency(0)} detail="Synthese SYSCOHADA" icon={Landmark} tone="green" progress={64}/><StatCard label="Creances clients" value={formatCurrency(data.creances_clients)} detail="Solde encore a recouvrer" icon={CircleDollarSign} tone="orange" progress={42}/><StatCard label="Stock critique matiere" value={`${data.alertes_stock || 0} alerte(s)`} detail="Sous le seuil minimum" icon={PackageX} tone={data.alertes_stock ? "red" : "green"} progress={data.alertes_stock ? 24 : 100}/></section>
+      <section className="dashboard-grid"><div className="panel"><div className="panel-head"><div><h2>Equilibre Industriel : Ventes vs Couts d'Extrusion</h2><p>Projection hebdomadaire consolidee</p></div><Badge>USD</Badge></div><div className="chart-wrap"><SalesChart total={Number(data.ventes_mois?.chiffre_affaires || 0) / 4}/></div></div><div className="panel"><div className="panel-head"><div><h2>Capacite Usine & Extrusion</h2><p>Rendement synthetique</p></div><Badge tone="green">Actif</Badge></div><div className="panel-body" style={{ textAlign: "center", padding: "28px" }}><Factory size={42} color="var(--green)"/><div className="metric-value" style={{ marginTop: 10 }}>{data.produits_finis?.nombre || 0}</div><div className="micro" style={{ color: "var(--muted)", fontSize: 9 }}>References produits finis</div></div></div></section>
+      <section className="dashboard-grid"><div className="panel"><div className="panel-head"><div><h2>Operations Recentes</h2><p>Flux des ventes produits finis</p></div><Badge>Dernieres ventes</Badge></div><RecentSales rows={data.ventes_recentes}/></div><div className="side-stack"><div className="panel"><div className="panel-head"><div><h2>Stocks Matieres en Alerte</h2><p>Seuil de securite usine</p></div><Badge tone="red">Urgent</Badge></div><StockAlerts rows={state.data?.alerts}/></div><div className="panel"><div className="panel-head"><h2>Effectifs Usine</h2><Badge tone="green">Actifs</Badge></div><div className="panel-body"><div className="metric-value green">{data.personnel_actif || 0}</div><small>collaborateurs actifs aujourd'hui</small></div></div></div></section>
+    </div>;
+  }
+
   const config = dashboardFor(user?.nom_role, data);
   const ActionIcon = config.action.icon;
 
