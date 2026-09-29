@@ -10,8 +10,6 @@ const BRAND = {
   green: [39, 190, 151],
 };
 
-let logoPromise;
-
 function printable(value) {
   if (value === null || value === undefined || value === "") return "-";
   if (value instanceof Date) return value.toLocaleString("fr-FR");
@@ -20,34 +18,34 @@ function printable(value) {
   return String(value);
 }
 
-function loadLogo() {
-  if (!logoPromise) {
-    logoPromise = fetch(`${import.meta.env.BASE_URL}pvc-logo.png`)
-      .then((response) => response.blob())
-      .then((blob) => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      }))
-      .catch(() => null);
-  }
-  return logoPromise;
+function drawBrandMark(doc) {
+  doc.setFillColor(...BRAND.accent);
+  doc.roundedRect(13, 7, 20, 20, 2.5, 2.5, "F");
+
+  doc.setDrawColor(255, 255, 255);
+  doc.setLineWidth(1.8);
+  doc.line(19, 22.5, 19, 12);
+  doc.line(19, 12, 25, 12);
+  doc.roundedRect(24, 12, 4, 5, 2, 2, "S");
+
+  doc.setDrawColor(...BRAND.green);
+  doc.setLineWidth(1.7);
+  doc.line(18.5, 23.5, 28.5, 13.5);
 }
 
-function drawHeader(doc, { logo, title, documentNumber }) {
+function drawHeader(doc, { title, documentNumber }) {
   const width = doc.internal.pageSize.getWidth();
   doc.setFillColor(...BRAND.primary);
   doc.rect(0, 0, width, 34, "F");
-  if (logo) doc.addImage(logo, "PNG", 13, 7, 20, 20, undefined, "FAST");
+  drawBrandMark(doc);
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(15);
-  doc.text(BRAND.name, logo ? 38 : 14, 14);
+  doc.text(BRAND.name, 38, 14);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7.5);
-  doc.text(BRAND.activity, logo ? 38 : 14, 20);
-  doc.text(BRAND.location, logo ? 38 : 14, 25);
+  doc.text(BRAND.activity, 38, 20);
+  doc.text(BRAND.location, 38, 25);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.text(title, width - 14, 14, { align: "right" });
@@ -120,9 +118,8 @@ export async function exportTablePdf({
   documentNumber = "", recipient = null, notes = "", signatures = false,
 }) {
   const doc = new jsPDF({ orientation, unit: "mm", format: "a4" });
-  const logo = await loadLogo();
   const generatedAt = new Date().toLocaleString("fr-FR");
-  drawHeader(doc, { logo, title, documentNumber });
+  drawHeader(doc, { title, documentNumber });
   let startY = drawInformation(doc, { subtitle, recipient, generatedAt });
   startY = drawSummary(doc, summary, startY);
 
@@ -135,14 +132,14 @@ export async function exportTablePdf({
     headStyles: { fillColor: BRAND.accent, textColor: 255, fontStyle: "bold", halign: "left" },
     alternateRowStyles: { fillColor: [247, 249, 252] },
     margin: { left: 14, right: 14, top: 42, bottom: 18 },
-    willDrawPage: () => drawHeader(doc, { logo, title, documentNumber }),
+    willDrawPage: () => drawHeader(doc, { title, documentNumber }),
   });
 
   let finalY = (doc.lastAutoTable?.finalY || startY) + 8;
   const pageHeight = doc.internal.pageSize.getHeight();
   if ((notes || signatures) && finalY > pageHeight - 42) {
     doc.addPage();
-    drawHeader(doc, { logo, title, documentNumber });
+    drawHeader(doc, { title, documentNumber });
     finalY = 46;
   }
   if (notes) {

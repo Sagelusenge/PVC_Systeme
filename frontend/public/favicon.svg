@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="PVC Renovee">
+  <rect x="4" y="4" width="56" height="56" rx="12" fill="#2d6bea"/>
+  <path d="M20 46V17h16c7 0 12 4 12 10s-5 10-12 10H20" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M19 48 47 20" fill="none" stroke="#27be97" stroke-width="5" stroke-linecap="round"/>
+</svg>
