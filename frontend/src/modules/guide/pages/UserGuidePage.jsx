@@ -26,6 +26,107 @@ const dashboardActions = [
   ["Comprendre les couleurs", "Aide a reconnaitre rapidement les informations normales, positives ou urgentes."],
 ];
 
+const siteGuides = [
+  {
+    title: "Connexion et navigation",
+    summary: "Se connecter, reconnaitre son espace et circuler dans le site.",
+    details: ["Chaque utilisateur se connecte avec son email ou son nom d'utilisateur et son mot de passe.", "Le menu affiche uniquement les modules autorises par le role du compte.", "Le lien bleu indique toujours la page actuellement ouverte."],
+    steps: ["Saisissez vos identifiants puis cliquez sur Se connecter.", "Choisissez un module dans le menu de gauche.", "Utilisez USD ou FC pour changer la devise d'affichage.", "Cliquez sur votre nom pour modifier votre profil, ou sur le bouton marche/arret pour quitter."],
+    result: "Vous ouvrez une session securisee avec uniquement les fonctions autorisees pour votre role.",
+  },
+  {
+    title: "Parcours commercial complet",
+    summary: "Comprendre l'ordre client, commande, facture, paiement et comptabilite.",
+    details: ["Un client doit d'abord exister dans Fichier Clients.", "Une commande peut contenir plusieurs produits.", "La facture reprend automatiquement les produits et quantites de la commande.", "Le paiement diminue la creance et cree les mouvements comptables necessaires."],
+    steps: ["Creez ou recherchez le client.", "Enregistrez sa commande avec tous les produits demandes.", "Dans Ventes et Factures, cliquez sur Facturer une commande.", "Verifiez les lignes reprises puis creez la facture.", "Enregistrez le paiement total ou partiel et imprimez le recu."],
+    result: "La commande, la facture, le stock, le solde client, le paiement et la comptabilite restent relies sans double saisie.",
+  },
+  {
+    title: "Fichier Clients",
+    summary: "Creer un client, definir son paiement et consulter sa fiche.",
+    details: ["La fiche contient le nom, l'adresse, les conditions de paiement et le solde.", "Comptant signifie que le paiement est attendu immediatement.", "Tranche ouvre un champ pour definir le nombre de jours accordes au client."],
+    steps: ["Cliquez sur Nouveau client.", "Renseignez le nom ou la raison sociale et l'adresse.", "Choisissez Comptant ou Tranche ; en cas de tranche, indiquez le delai en jours.", "Enregistrez, puis utilisez la recherche pour retrouver le client.", "Utilisez l'icone PDF pour produire sa fiche avec ses operations."],
+    result: "Le client devient disponible dans les commandes, les factures et les paiements.",
+  },
+  {
+    title: "Commandes Clients",
+    summary: "Enregistrer plusieurs produits et suivre la commande jusqu'a la facture.",
+    details: ["Une commande appartient a un seul client mais peut contenir plusieurs produits.", "Le prix total est calcule automatiquement et ne peut pas etre saisi manuellement.", "Le statut indique si la commande attend, est livree, facturee ou annulee."],
+    steps: ["Cliquez sur Nouvelle commande et choisissez le client.", "Selectionnez un produit, sa quantite et son prix.", "Cliquez sur Ajouter un produit pour creer autant de lignes que necessaire.", "Verifiez le total, la date de livraison et l'acompte eventuel.", "Enregistrez puis utilisez Modifier, Imprimer, Facturer, Annuler ou Supprimer selon le statut."],
+    result: "La commande reste disponible dans Ventes et Factures pour etre transformee en facture avec les memes quantites.",
+  },
+  {
+    title: "Ventes et Factures",
+    summary: "Facturer une commande ou enregistrer exceptionnellement une vente directe.",
+    details: ["Facturer une commande est le parcours recommande car les lignes sont deja validees.", "Vente directe sert lorsqu'aucune commande n'a ete creee.", "La creation d'une facture met a jour le stock, la creance client et la comptabilite."],
+    steps: ["Cliquez sur Facturer une commande.", "Choisissez le client puis la commande en attente.", "Controlez les produits, quantites, prix et total affiches.", "Cliquez sur Creer la facture.", "Retrouvez la facture dans la liste et utilisez l'icone d'impression pour obtenir le PDF."],
+    result: "Une facture numerotee est creee, les produits sortent du stock et l'ecriture de vente est comptabilisee.",
+  },
+  {
+    title: "Paiements Clients",
+    summary: "Encaisser une facture en une ou plusieurs fois et imprimer le recu.",
+    details: ["Le reste a payer correspond au total de la facture moins les paiements deja recus.", "Un paiement partiel conserve la facture ouverte.", "Le paiement total marque la facture comme payee."],
+    steps: ["Dans Ventes et Factures, cliquez sur Nouveau paiement.", "Selectionnez la facture encore impayee.", "Saisissez le motif, le montant, la devise et le mode de paiement.", "Enregistrez puis ouvrez l'onglet Paiements recus.", "Imprimez le recu ; utilisez Annuler seulement en cas d'erreur, car une ecriture inverse sera creee."],
+    result: "Le paiement diminue la creance du client et alimente automatiquement la caisse ou la banque en comptabilite.",
+  },
+  {
+    title: "Stock des Matieres",
+    summary: "Suivre les quantites, receptions, sorties et besoins de reapprovisionnement.",
+    details: ["Le stock disponible montre la quantite restante.", "Le CMUP est le cout moyen unitaire pondere utilise pour valoriser la matiere.", "Une alerte apparait lorsque le stock atteint ou passe sous le seuil minimum."],
+    steps: ["Creez une nouvelle matiere si la reference n'existe pas.", "Utilisez Nouvelle reception pour ajouter une quantite achetee et son prix.", "Utilisez Nouvelle sortie lorsqu'une matiere est remise a la production.", "Consultez Historique des mouvements pour verifier les entrees et sorties.", "Imprimez l'etat du stock et traitez en priorite les lignes A commander."],
+    result: "Les quantites, le cout moyen, la valeur du stock et les alertes sont recalcules apres chaque mouvement.",
+  },
+  {
+    title: "Production et Extrusion",
+    summary: "Distinguer une reference produit d'une fabrication reelle.",
+    details: ["Ajouter une reference produit cree seulement un article dans le catalogue.", "Enregistrer une fabrication ajoute une quantite reellement produite au stock fini.", "Le cout de fabrication sert au suivi industriel du lot."],
+    steps: ["Ajoutez la reference si le produit n'existe pas encore.", "Pour une production reelle, cliquez sur Enregistrer une fabrication.", "Selectionnez le produit, la quantite, l'unite et le cout unitaire.", "Enregistrez puis controlez le nouveau stock dans la liste.", "Utilisez Imprimer le stock pour obtenir l'etat PDF des produits finis."],
+    result: "Le produit fabrique entre dans le stock et devient disponible pour les commandes et les ventes.",
+  },
+  {
+    title: "Comptabilite SYSCOHADA",
+    summary: "Saisir une operation equilibree et lire les etats comptables.",
+    details: ["Chaque operation utilise obligatoirement au moins un compte au debit et un compte au credit.", "Le total des debits doit toujours etre egal au total des credits.", "Les ventes et paiements generent deja leurs ecritures automatiquement."],
+    steps: ["Ouvrez Saisie des Ecritures puis Passer une ecriture.", "Choisissez le journal, le numero de piece, le compte a debiter et le compte a crediter.", "Saisissez le montant, la devise, le taux, la date et le libelle.", "Validez puis controlez la piece dans le Journal des operations.", "Utilisez le Grand livre, la Balance et le Bilan pour analyser les comptes."],
+    result: "Deux lignes equilibrees sont creees pour la meme piece : une au debit et une au credit.",
+  },
+  {
+    title: "Personnel, Presences et Paie",
+    summary: "Gerer les agents depuis leur creation jusqu'au bulletin de paie.",
+    details: ["Personnel conserve les informations des agents.", "Presences enregistre l'heure d'arrivee puis l'heure de sortie.", "Paie calcule la base, les avantages, les retenues, le net et le montant paye."],
+    steps: ["Creez l'agent dans l'onglet Personnel.", "Chaque jour, utilisez Nouveau pointage pour enregistrer son arrivee puis sa sortie.", "Dans Paie, cliquez sur Creer une paie et choisissez l'agent et la periode.", "Verifiez la base, les avantages, les retenues et le net.", "Enregistrez puis imprimez le bulletin PDF individuel."],
+    result: "Le dossier RH, les presences et les paiements de salaire restent consultables par agent et par periode.",
+  },
+  {
+    title: "Parc et Amortissements",
+    summary: "Enregistrer un materiel et suivre sa valeur dans le temps.",
+    details: ["La valeur d'acquisition est le cout d'achat du materiel.", "Le taux, la duree, le mode et la periodicite servent au calcul de l'amortissement.", "Le statut indique si le materiel est en service, en maintenance, hors service ou vendu."],
+    steps: ["Cliquez sur Nouveau materiel.", "Renseignez la designation, la date, la valeur et les parametres d'amortissement.", "Choisissez l'etat actuel puis enregistrez.", "Utilisez le crayon pour corriger les informations autorisees.", "Imprimez le parc pour obtenir un etat avec totaux et signatures."],
+    result: "Le materiel entre dans le parc et son plan d'amortissement est initialise.",
+  },
+  {
+    title: "Rapports et Etats de sortie",
+    summary: "Consulter, actualiser, exporter et imprimer les donnees officielles.",
+    details: ["Les onglets separent ventes, stock, creances, fournisseurs, paie, amortissements, bilan et resultat.", "CSV sert a retravailler les donnees dans un tableur.", "PDF produit un document presente avec le logo, l'en-tete, les totaux et la date."],
+    steps: ["Choisissez le rapport voulu dans les onglets.", "Cliquez sur Actualiser pour relire les dernieres donnees.", "Verifiez le nombre de lignes et les totaux affiches.", "Utilisez Exporter CSV pour l'analyse ou Imprimer en PDF pour l'archive et la signature."],
+    result: "Vous obtenez un etat a jour sans ressaisir les informations des modules metier.",
+  },
+  {
+    title: "Utilisateurs et Roles",
+    summary: "Creer les acces, attribuer les responsabilites et bloquer un compte.",
+    details: ["Un utilisateur possede un nom, un email, un mot de passe, un role et un statut.", "Le role determine les pages et actions visibles.", "Bloquer conserve l'historique mais empeche la connexion."],
+    steps: ["Creez d'abord le role s'il n'existe pas.", "Cliquez sur Nouvel utilisateur et renseignez ses acces.", "Choisissez un role actif et enregistrez le compte.", "Utilisez le crayon pour modifier et le cadenas pour bloquer ou debloquer.", "Supprimez un role uniquement lorsqu'aucun utilisateur ne lui est rattache."],
+    result: "Chaque acteur dispose uniquement des fonctions correspondant a sa responsabilite.",
+  },
+  {
+    title: "Recherche, filtres et icones",
+    summary: "Retrouver une donnee et comprendre les actions presentes dans les tableaux.",
+    details: ["La zone de recherche filtre les lignes par nom, reference ou client.", "Les listes de statut limitent l'affichage aux elements payes, impayes, actifs ou en attente.", "Le crayon modifie, l'imprimante produit un PDF, la corbeille supprime et le cadenas bloque."],
+    steps: ["Saisissez quelques lettres dans la recherche.", "Ajoutez un filtre de statut si la liste reste longue.", "Lisez l'infobulle en laissant la souris sur une icone.", "Verifiez toujours la ligne selectionnee avant une modification, une annulation ou une suppression."],
+    result: "Vous trouvez rapidement l'information et utilisez l'action adaptee sans modifier la mauvaise ligne.",
+  },
+];
+
 const roleGuides = {
   Administrateur: {
     intro: "Configure les comptes, les roles et controle l'ensemble de la plateforme.",
@@ -60,7 +161,7 @@ const roleGuides = {
       ["Comptabilite Generale", "Affiche la synthese des debits, credits, journaux et sous-comptes."],
       ["Modifier le taux", "Change le taux USD vers FC enregistre dans MariaDB."],
       ["Nouvelle ecriture", "Ouvre la page de saisie comptable."],
-      ["Passer une ecriture", "Choisissez le journal, le compte, la contrepartie, le sens, le montant et la devise, puis validez."],
+      ["Passer une ecriture", "Choisissez le journal, la piece, le compte a debiter, le compte a crediter, le montant et la devise, puis validez."],
       ["Journal des operations", "Affiche chronologiquement toutes les pieces comptabilisees."],
       ["Grand livre analytique", "Regroupe les mouvements et calcule le solde de chaque sous-compte."],
       ["Balance generale", "Compare les debits, credits et soldes par compte ou sous-compte."],
@@ -95,10 +196,10 @@ const roleGuides = {
     actions: [
       ["Fichier Clients", "Consulte ou ajoute les clients avec leurs conditions de paiement."],
       ["Fiche client PDF", "Exporte le compte, les ventes et les paiements du client."],
-      ["Nouvelle vente", "Selectionnez le client et le produit, indiquez la quantite, le prix et le paiement initial."],
+      ["Vente directe", "Enregistre une vente sans commande prealable en indiquant le client, le produit, la quantite et le paiement initial."],
       ["Encaisser reglement", "Ajoute un paiement sur une vente existante."],
       ["Commandes Clients", "Consulte les commandes et leurs statuts."],
-      ["Nouvelle commande", "Renseignez le client, le produit, la quantite, la livraison et l'anticipation."],
+      ["Nouvelle commande", "Renseignez le client, ajoutez tous les produits demandes, puis verifiez la livraison, l'acompte et le total."],
       ["Livrer et facturer", "Transforme la commande en facture, retire le stock et cree les ecritures comptables automatiquement."],
       ["Actions commande", "Permet de modifier, imprimer, annuler ou supprimer une commande selon son statut."],
     ],
@@ -179,8 +280,8 @@ const actionContents = {
   "Crayon role": ["Le nom et la description actuels du role.", "Les informations modifiables sans affecter les operations deja enregistrees."],
   "Bloquer role": ["Le statut global du role.", "Les comptes du role bloque ne peuvent plus ouvrir de session."],
   "Corbeille role": ["Une confirmation avant suppression.", "Un blocage automatique lorsque le role est encore attribue a un utilisateur."],
-  "Nouvelle vente PF": ["Le formulaire client, produit, quantite, prix et paiement initial.", "Le total calcule avant validation de la facture."],
-  "Ecriture journal": ["Le formulaire de piece comptable avec journal, comptes, sens et montant.", "Le controle debit-credit avant enregistrement."],
+  "Nouvelle vente PF": ["Le module Ventes et Factures avec les commandes a facturer et les ventes directes.", "Les factures, paiements et montants restant a encaisser."],
+  "Ecriture journal": ["Le formulaire de piece comptable avec journal, compte a debiter, compte a crediter et montant.", "La creation simultanee des deux lignes de la partie double."],
   "Modules metier": ["Les espaces Production, Stock, Ventes, Commandes, Clients, RH et Immobilisations.", "Uniquement les modules autorises pour le role connecte."],
   Rapports: ["Les rapports de ventes, stock, finance, paie et amortissements autorises.", "Les totaux et tableaux consolides issus des operations enregistrees."],
   "PDF / Imprimer": ["L'etat affiche, son titre et sa date de generation.", "Un tableau pagine pret a etre archive ou imprime."],
@@ -207,9 +308,9 @@ const actionContents = {
   "Nouveau pointage": ["Les agents actifs et les heures d'arrivee et de sortie.", "Le bouton de sortie reste visible sur chaque pointage ouvert."],
   "Creer une paie": ["Le salaire de base, les avantages, les retenues et le net.", "La periode, la devise, le mode et la reference du paiement."],
   "Bulletin PDF": ["L'agent, la periode et le mode de paiement.", "Le detail base, avantages, retenues, net et montant paye."],
-  "Nouvelle vente": ["Le choix du client et du produit fini.", "La quantite, le prix, le mode de vente et le paiement initial."],
+  "Vente directe": ["Le choix du client et du produit fini lorsqu'aucune commande n'existe.", "La quantite, le prix, le mode de vente et le paiement initial."],
   "Commandes Clients": ["Les commandes, dates de livraison et statuts d'avancement.", "Les produits, quantites et clients rattaches."],
-  "Nouvelle commande": ["Le formulaire client, produit, quantite et date de livraison.", "Les informations d'anticipation necessaires a la production."],
+  "Nouvelle commande": ["Le client, la date de livraison et toutes les lignes de produits.", "Les quantites, prix, sous-totaux, acompte et total general calcule."],
   "Livrer et facturer": ["La commande en attente et la disponibilite du stock.", "La facture, le paiement initial et les ecritures comptables crees sans double saisie."],
   "Actions commande": ["Les boutons Modifier, Imprimer, Livrer et facturer, Annuler et Supprimer.", "Seules les actions encore possibles selon le statut sont affichees."],
   "Matieres & Reappro": ["Le stock disponible, le CMUP et le seuil d'alerte de chaque matiere.", "Les entrees, sorties et besoins de reapprovisionnement."],
@@ -257,6 +358,27 @@ function GuideAccordion({ items, section, role, openItem, onToggle }) {
   </div>;
 }
 
+function SiteGuideAccordion({ items, openItem, onToggle }) {
+  return <div className="guide-list">
+    {items.map((item, index) => {
+      const itemId = `site-module-${index}`;
+      const isOpen = openItem === itemId;
+      return <article className={`guide-row ${isOpen ? "open" : ""}`} key={item.title}>
+        <button className="guide-trigger" type="button" aria-expanded={isOpen} aria-controls={`${itemId}-content`} onClick={() => onToggle(itemId)}>
+          <span className="guide-number">{String(index + 1).padStart(2, "0")}</span>
+          <span className="guide-label"><strong><MousePointerClick /> {item.title}</strong><small>{item.summary}</small></span>
+          <ChevronDown className="guide-chevron" aria-hidden="true" />
+        </button>
+        {isOpen && <div className="guide-content" id={`${itemId}-content`}>
+          <div className="guide-detail"><h3>A quoi sert cet espace</h3><ul>{item.details.map((detail) => <li key={detail}>{detail}</li>)}</ul></div>
+          <div className="guide-detail"><h3>Parcours recommande</h3><ol>{item.steps.map((step) => <li key={step}>{step}</li>)}</ol></div>
+          <div className="guide-result"><CheckCircle2 /> <span><strong>Apres validation :</strong> {item.result}</span></div>
+        </div>}
+      </article>;
+    })}
+  </div>;
+}
+
 export default function UserGuidePage() {
   const { user } = useAuth();
   const initialRole = roleGuides[user?.nom_role] ? user.nom_role : "Administrateur";
@@ -265,8 +387,9 @@ export default function UserGuidePage() {
   const guide = roleGuides[role];
   const roles = useMemo(() => Object.keys(roleGuides), []);
   return <div className="page">
-    <header className="page-header"><div><span className="eyebrow">Aide integree // procedures par acteur</span><h1>Guide d'Utilisation</h1><p>Selectionnez un role pour comprendre ses ecrans, ses boutons et le parcours recommande.</p></div><Badge tone="green"><BookOpenText size={14}/>Guide interne</Badge></header>
+    <header className="page-header"><div><span className="eyebrow">Aide integree // manuel complet</span><h1>Guide d'Utilisation</h1><p>Comprenez toute la plateforme, ses parcours, ses boutons et les responsabilites de chaque acteur.</p></div><Badge tone="green"><BookOpenText size={14}/>Guide interne</Badge></header>
     <div className="toolbar"><div className="tabs guide-role-tabs">{roles.map((name) => <button key={name} className={`tab ${role===name?"active":""}`} onClick={()=>{ setRole(name); setOpenItem(null); }}>{name}</button>)}</div></div>
+    <section className="panel"><div className="panel-head"><div><h2>Manuel complet de la plateforme</h2><p>Ouvrez un module pour connaitre son objectif, le parcours recommande et le resultat obtenu.</p></div><BookOpenText size={20}/></div><SiteGuideAccordion items={siteGuides} openItem={openItem} onToggle={(itemId) => setOpenItem((current) => current === itemId ? null : itemId)} /></section>
     <section className="panel"><div className="panel-head"><div><h2>Comprendre le tableau de bord</h2><p>Lisez chaque element dans l'ordre. Cliquez sur une ligne pour obtenir une explication simple et savoir quoi faire.</p></div><BookOpenText size={20}/></div><GuideAccordion items={dashboardActions} section="dashboard" role="general" openItem={openItem} onToggle={(itemId) => setOpenItem((current) => current === itemId ? null : itemId)} /></section>
     <section className="panel"><div className="panel-head"><div><h2>{role}</h2><p>{guide.intro}</p></div><ShieldCheck size={20}/></div><GuideAccordion items={guide.actions} section="role" role={role} openItem={openItem} onToggle={(itemId) => setOpenItem((current) => current === itemId ? null : itemId)} /></section>
     <section className="panel"><div className="panel-head"><div><h2>Boutons communs</h2><p>Commandes disponibles dans la barre superieure</p></div><CheckCircle2 size={20}/></div><GuideAccordion items={commonActions} section="common" role={role} openItem={openItem} onToggle={(itemId) => setOpenItem((current) => current === itemId ? null : itemId)} /></section>
