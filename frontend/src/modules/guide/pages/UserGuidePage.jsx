@@ -11,6 +11,21 @@ const commonActions = [
   ["Menu lateral", "Ouvre le module autorise par votre role. Le lien bleu indique la page active."],
 ];
 
+const dashboardActions = [
+  ["En-tete du cockpit", "Presente la periode suivie et donne acces aux operations rapides."],
+  ["Ventes produits finis", "Montre le chiffre d'affaires des ventes du mois et le nombre de factures."],
+  ["Resultat net d'exploitation", "Resume le resultat calcule a partir des produits et des charges comptables."],
+  ["Creances clients", "Indique tout l'argent facture qui n'a pas encore ete encaisse."],
+  ["Stock critique matiere", "Compte les matieres dont la quantite est sous le seuil de securite."],
+  ["Graphique ventes, couts et marge", "Compare simplement ce qui est vendu, ce que la fabrication coute et ce qui reste."],
+  ["Semaines et infobulle", "Permet de lire les montants semaine par semaine en passant la souris sur le graphique."],
+  ["Capacite usine et extrusion", "Affiche le nombre de references de produits finis gerees par l'usine."],
+  ["Operations recentes", "Montre les dernieres factures afin de suivre l'activite commerciale."],
+  ["Stocks matieres en alerte", "Liste les matieres a reapprovisionner en priorite."],
+  ["Effectifs usine", "Affiche le nombre de collaborateurs actifs enregistres dans le systeme."],
+  ["Comprendre les couleurs", "Aide a reconnaitre rapidement les informations normales, positives ou urgentes."],
+];
+
 const roleGuides = {
   Administrateur: {
     intro: "Configure les comptes, les roles et controle l'ensemble de la plateforme.",
@@ -141,7 +156,19 @@ const roleGuides = {
 };
 
 const actionContents = {
-  "Tableau de Bord": ["Les indicateurs financiers et operationnels accessibles a votre role.", "Les ventes recentes, les alertes de stock et l'activite de production.", "Des raccourcis vers les operations que vous utilisez le plus souvent."],
+  "Tableau de Bord": ["Les indicateurs financiers et operationnels accessibles a votre role.", "Les ventes recentes, les alertes de stock et l'activite de production.", "Lisez d'abord les quatre cartes, puis le graphique et enfin les listes d'alerte."],
+  "En-tete du cockpit": ["La periode active indique l'exercice actuellement consulte.", "Nouvelle vente PF ouvre la facturation des produits finis.", "Ecriture journal ouvre une saisie comptable en partie double."],
+  "Ventes produits finis": ["Le grand montant est le chiffre d'affaires des factures du mois en cours.", "La petite ligne indique combien de ventes composent ce montant.", "Exemple : 10 000 $US et 40 ventes signifie que 40 factures totalisent 10 000 $US."],
+  "Resultat net d'exploitation": ["Un montant positif signifie que les produits sont superieurs aux charges.", "Un montant negatif signifie que les charges sont plus elevees que les produits.", "Un montant nul peut signifier qu'aucun resultat n'est encore disponible pour la periode."],
+  "Creances clients": ["Ce montant correspond aux factures qui restent totalement ou partiellement impayees.", "Plus le montant augmente, plus l'entreprise attend de l'argent de ses clients.", "Ouvrez Ventes et Factures, puis Paiements recus, pour enregistrer les encaissements."],
+  "Stock critique matiere": ["Zero alerte signifie que toutes les matieres sont au-dessus de leur seuil minimum.", "Une ou plusieurs alertes signifient qu'un reapprovisionnement doit etre prepare.", "Ouvrez Matieres et Reappro pour connaitre les references et quantites concernees."],
+  "Graphique ventes, couts et marge": ["La barre bleue represente les ventes : l'argent genere par les produits factures.", "La barre orange represente les couts d'extrusion : l'estimation de ce que la fabrication a coute.", "La ligne verte represente la marge brute : ventes moins couts d'extrusion.", "Exemple : 1 851 $US de ventes moins 1 148 $US de couts donne 703 $US de marge brute."],
+  "Semaines et infobulle": ["SEM 1 a SEM 5 representent les semaines de la projection affichee.", "Passez la souris sur une semaine pour voir les trois montants exacts.", "Ce graphique est une projection de pilotage ; les etats comptables restent la reference officielle."],
+  "Capacite usine et extrusion": ["Le nombre affiche correspond aux references de produits finis disponibles dans le catalogue.", "Il ne represente pas la quantite physique en stock.", "Ouvrez Production et Extrusion pour consulter le stock de chaque produit et enregistrer une fabrication."],
+  "Operations recentes": ["Chaque ligne montre une facture recente avec sa date, son client et son montant.", "Cette zone permet de verifier rapidement que les dernieres ventes ont bien ete enregistrees.", "Ouvrez Ventes et Factures pour imprimer une facture ou enregistrer un paiement."],
+  "Stocks matieres en alerte": ["Chaque ligne correspond a une matiere dont le stock disponible est trop faible.", "Traitez d'abord les matieres les plus proches de zero ou necessaires a une fabrication urgente.", "Une reception de matiere met a jour le stock apres son enregistrement."],
+  "Effectifs usine": ["Le nombre correspond aux collaborateurs ayant un statut actif.", "Il ne signifie pas que tous sont presents aujourd'hui.", "Ouvrez Personnel et Salaires, puis Presences, pour consulter les pointages du jour."],
+  "Comprendre les couleurs": ["Bleu : information principale ou action courante.", "Vert : situation positive, marge ou element actif.", "Orange : montant ou situation qui demande une surveillance.", "Rouge : alerte urgente ou action sensible."],
   "Utilisateurs & Roles": ["Les deux espaces Utilisateurs et Gestion des roles.", "Le nombre de comptes, les statuts actifs ou bloques et les roles attribues.", "Les commandes de creation et de modification des acces."],
   Utilisateurs: ["La liste des comptes avec le nom, l'email, le role et le statut.", "La recherche et les actions de modification disponibles pour chaque ligne."],
   "Nouvel utilisateur": ["Le formulaire d'identite et d'adresse email.", "Le choix du role, du statut et du mot de passe initial."],
@@ -208,6 +235,7 @@ const actionContents = {
 };
 
 function GuideAccordion({ items, section, role, openItem, onToggle }) {
+  const isDashboard = section === "dashboard";
   return <div className="guide-list">
     {items.map(([button, instruction], index) => {
       const itemId = `${section}-${role}-${index}`;
@@ -220,9 +248,9 @@ function GuideAccordion({ items, section, role, openItem, onToggle }) {
           <ChevronDown className="guide-chevron" aria-hidden="true" />
         </button>
         {isOpen && <div className="guide-content" id={`${itemId}-content`}>
-          <div className="guide-detail"><h3>Ce que vous trouverez</h3><ul>{contents.map((content) => <li key={content}>{content}</li>)}</ul></div>
-          <div className="guide-detail"><h3>Comment l'utiliser</h3><ol><li>Ouvrez <strong>{button}</strong> depuis le menu ou le bouton indique.</li><li>Consultez les informations affichees et completez les champs demandes si l'action autorise une saisie.</li><li>Verifiez le resultat, puis utilisez le bouton de validation ou revenez au module sans enregistrer.</li></ol></div>
-          <div className="guide-result"><CheckCircle2 /> <span><strong>Resultat attendu :</strong> {instruction}</span></div>
+          <div className="guide-detail"><h3>{isDashboard ? "Ce que cela signifie" : "Ce que vous trouverez"}</h3><ul>{contents.map((content) => <li key={content}>{content}</li>)}</ul></div>
+          <div className="guide-detail"><h3>{isDashboard ? "Comment le lire" : "Comment l'utiliser"}</h3>{isDashboard ? <ol><li>Lisez le grand nombre ou le titre principal.</li><li>Regardez la petite phrase situee juste en dessous pour comprendre la periode ou le detail.</li><li>Utilisez l'explication ci-contre pour savoir si une action est necessaire.</li></ol> : <ol><li>Ouvrez <strong>{button}</strong> depuis le menu ou le bouton indique.</li><li>Consultez les informations affichees et completez les champs demandes si l'action autorise une saisie.</li><li>Verifiez le resultat, puis utilisez le bouton de validation ou revenez au module sans enregistrer.</li></ol>}</div>
+          <div className="guide-result"><CheckCircle2 /> <span><strong>{isDashboard ? "A retenir :" : "Resultat attendu :"}</strong> {instruction}</span></div>
         </div>}
       </article>;
     })}
@@ -239,6 +267,7 @@ export default function UserGuidePage() {
   return <div className="page">
     <header className="page-header"><div><span className="eyebrow">Aide integree // procedures par acteur</span><h1>Guide d'Utilisation</h1><p>Selectionnez un role pour comprendre ses ecrans, ses boutons et le parcours recommande.</p></div><Badge tone="green"><BookOpenText size={14}/>Guide interne</Badge></header>
     <div className="toolbar"><div className="tabs guide-role-tabs">{roles.map((name) => <button key={name} className={`tab ${role===name?"active":""}`} onClick={()=>{ setRole(name); setOpenItem(null); }}>{name}</button>)}</div></div>
+    <section className="panel"><div className="panel-head"><div><h2>Comprendre le tableau de bord</h2><p>Lisez chaque element dans l'ordre. Cliquez sur une ligne pour obtenir une explication simple et savoir quoi faire.</p></div><BookOpenText size={20}/></div><GuideAccordion items={dashboardActions} section="dashboard" role="general" openItem={openItem} onToggle={(itemId) => setOpenItem((current) => current === itemId ? null : itemId)} /></section>
     <section className="panel"><div className="panel-head"><div><h2>{role}</h2><p>{guide.intro}</p></div><ShieldCheck size={20}/></div><GuideAccordion items={guide.actions} section="role" role={role} openItem={openItem} onToggle={(itemId) => setOpenItem((current) => current === itemId ? null : itemId)} /></section>
     <section className="panel"><div className="panel-head"><div><h2>Boutons communs</h2><p>Commandes disponibles dans la barre superieure</p></div><CheckCircle2 size={20}/></div><GuideAccordion items={commonActions} section="common" role={role} openItem={openItem} onToggle={(itemId) => setOpenItem((current) => current === itemId ? null : itemId)} /></section>
   </div>;
