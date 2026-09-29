@@ -28,8 +28,8 @@ async function insertEntry(connection, data) {
 }
 
 async function insertPair(connection, data) {
-  await insertEntry(connection, { ...data, sens: "C", accountId: data.debitId, counterpartId: data.creditId });
-  await insertEntry(connection, { ...data, sens: "CP", accountId: data.creditId, counterpartId: data.debitId });
+  await insertEntry(connection, { ...data, sens: "CP", accountId: data.debitId, counterpartId: data.creditId });
+  await insertEntry(connection, { ...data, sens: "C", accountId: data.creditId, counterpartId: data.debitId });
 }
 
 async function recordSale(connection, { saleId, amount, date, user }) {

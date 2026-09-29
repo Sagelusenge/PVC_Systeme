@@ -1,5 +1,5 @@
 const createCrudRepository = require("../../shared/crud.repository");
-const { query } = require("../../config/database");
+const { query, withTransaction } = require("../../config/database");
 
 const resources = {
   comptes: createCrudRepository({ table: "tcomptes", columns: ["numero", "intitule", "masse_bilantaire", "id_naturecompte"], searchColumns: ["numero", "intitule"] }),
@@ -31,4 +31,36 @@ async function updateExchangeRate(rate) {
   return getExchangeRate();
 }
 
-module.exports = { ...resources, report, references, getExchangeRate, updateExchangeRate };
+async function createEntryPair(data, user) {
+  return withTransaction(async (connection) => {
+    const common = [
+      data.journal_id,
+      data.numdocument,
+      data.libelle || null,
+      data.date_ecriture,
+      data.montant,
+      data.um,
+      data.taux_convertion_usd_fc,
+      user,
+    ];
+    const debit = await connection.query(
+      `INSERT INTO tecritures_comptables
+        (journal_id,numdocument,sous_compte_id,sens,libelle,sous_compte_cp,date_ecriture,montant,um,taux_convertion_usd_fc,id_user)
+       VALUES (?, ?, ?, 'CP', ?, ?, ?, ?, ?, ?, ?)`,
+      [common[0], common[1], data.debit_sous_compte_id, common[2], data.credit_sous_compte_id, ...common.slice(3)]
+    );
+    const credit = await connection.query(
+      `INSERT INTO tecritures_comptables
+        (journal_id,numdocument,sous_compte_id,sens,libelle,sous_compte_cp,date_ecriture,montant,um,taux_convertion_usd_fc,id_user)
+       VALUES (?, ?, ?, 'C', ?, ?, ?, ?, ?, ?, ?)`,
+      [common[0], common[1], data.credit_sous_compte_id, common[2], data.debit_sous_compte_id, ...common.slice(3)]
+    );
+    const rows = await connection.query(
+      "SELECT * FROM tecritures_comptables WHERE id IN (?, ?) ORDER BY id",
+      [debit.insertId, credit.insertId]
+    );
+    return { document: data.numdocument, debit: rows[0], credit: rows[1] };
+  });
+}
+
+module.exports = { ...resources, report, references, getExchangeRate, updateExchangeRate, createEntryPair };

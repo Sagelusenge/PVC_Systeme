@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Factory, FileDown, Gauge, PackageCheck, Pencil, Plus, TimerReset, Trash2 } from "lucide-react";
 import useFetch from "../../../hooks/useFetch";
 import { createProduct, createProductionEntry, deleteProduct, listProducts, listProductionEntries, updateProduct } from "../services/production.api";
@@ -6,6 +6,7 @@ import Button from "../../../components/common/Button";
 import Modal from "../../../components/common/Modal";
 import Input from "../../../components/common/Input";
 import Select from "../../../components/common/Select";
+import SearchBar from "../../../components/common/SearchBar";
 import Table from "../../../components/common/Table";
 import Badge from "../../../components/common/Badge";
 import Loader from "../../../components/common/Loader";
@@ -20,9 +21,14 @@ export default function ProductionPage() {
   const [selectedId, setSelectedId] = useState(null);
   const [form, setForm] = useState({});
   const [error, setError] = useState("");
-  if (state.loading) return <Loader />;
+  const [query, setQuery] = useState("");
   const products = state.data?.products || [];
   const entries = state.data?.entries || [];
+  const filteredProducts = useMemo(() => {
+    const term = query.trim().toLowerCase();
+    return term ? products.filter((row) => `${row.code} ${row.libelle} ${row.unite}`.toLowerCase().includes(term)) : products;
+  }, [products, query]);
+  if (state.loading) return <Loader />;
 
   const open = (type, row = null) => {
     setModal(type); setSelectedId(row?.id || null); setError("");
@@ -61,12 +67,13 @@ export default function ProductionPage() {
     { key: "actions", label: "Actions", render: (_, row) => <div className="row-actions"><button className="icon-btn table-action" title="Modifier" onClick={() => open("product", row)}><Pencil /></button><button className="icon-btn table-action danger" title="Supprimer" onClick={() => removeProduct(row)}><Trash2 /></button></div> },
   ];
   return <div className="page">
-    <header className="page-header"><div><span className="eyebrow">Suivi de fabrication</span><h1>Production PVC</h1><p>Produits finis, arrivages de l'atelier et quantités disponibles.</p></div><div className="page-actions"><Button icon={FileDown} onClick={exportProducts}>Imprimer le stock</Button><Button onClick={() => open("product")} icon={Plus}>Nouveau produit</Button><Button variant="primary" onClick={() => open("entry")} icon={Factory}>Ajouter une production</Button></div></header>
+    <header className="page-header"><div><span className="eyebrow">Suivi de fabrication</span><h1>Production PVC</h1><p>Produits finis, fabrications de l'atelier et quantités disponibles.</p></div><div className="page-actions"><Button icon={FileDown} onClick={exportProducts}>Imprimer le stock</Button><Button onClick={() => open("product")} icon={Plus}>Ajouter une référence produit</Button><Button variant="primary" onClick={() => open("entry")} icon={Factory}>Enregistrer une fabrication</Button></div></header>
     <section className="metrics"><StatCard label="Valeur des produits" value={formatCurrency(value)} detail="Stock valorisé au prix de vente" icon={PackageCheck}/><StatCard label="Produits suivis" value={products.length} detail="Produits disponibles" icon={Factory} tone="green"/><StatCard label="Productions enregistrées" value={entries.length} detail="Arrivages venant de l'atelier" icon={TimerReset} tone="orange"/><StatCard label="Suivi de l'usine" value="ACTIF" detail="Production suivie" icon={Gauge} tone="green" progress={96}/></section>
-    <section className="panel"><div className="panel-head"><div><h2>Produits finis</h2><p>Codes automatiques, quantités et valeur</p></div><Badge>{products.length} produit(s)</Badge></div><Table columns={columns} rows={products}/></section>
+    <div className="toolbar"><Badge>{filteredProducts.length} produit(s)</Badge><SearchBar value={query} onChange={setQuery} placeholder="Filtrer les produits..." /></div>
+    <section className="panel"><div className="panel-head"><div><h2>Produits finis</h2><p>Quantités disponibles et valeur du stock</p></div><Badge>{filteredProducts.length} produit(s)</Badge></div><Table columns={columns} rows={filteredProducts}/></section>
     <section className="panel"><div className="panel-head"><div><h2>Dernières productions</h2><p>Quantités reçues depuis l'atelier</p></div><Badge>{entries.length} opération(s)</Badge></div><Table rows={entries} columns={[{key:"id",label:"N°"},{key:"id_produit_fini",label:"Produit"},{key:"date_entree",label:"Date",render:formatDate},{key:"quantite_entree",label:"Quantité",numeric:true},{key:"cout_production_unitaire",label:"Coût unitaire",numeric:true,render:formatCurrency}]}/></section>
-    <Modal open={modal === "product" || modal === "entry"} title={modal === "product" ? selectedId ? "Modifier le produit fini" : "Nouveau produit fini" : "Nouvelle entree de production"} onClose={() => setModal(null)} footer={<><Button onClick={() => setModal(null)}>Annuler</Button><Button variant="primary" onClick={submit}>Enregistrer</Button></>}>
-      {error && <div className="form-error">{error}</div>}<div className="form-grid" style={{ marginTop: 12 }}>{modal === "product" ? <><Input label="Code automatique" value={form.code || "Genere apres enregistrement"} disabled/><Input label="Libelle" value={form.libelle || ""} onChange={(event) => setForm({ ...form, libelle: event.target.value })}/><Input label="Unite" value={form.unite || ""} onChange={(event) => setForm({ ...form, unite: event.target.value })}/><Input label="Prix unitaire" type="number" value={form.prix_unitaire || ""} onChange={(event) => setForm({ ...form, prix_unitaire: event.target.value })}/></> : <><Select label="Produit fini" value={form.id_produit_fini} onChange={(event) => setForm({ ...form, id_produit_fini: event.target.value })} options={products.map((row) => ({ value: row.id, label: `${row.code} - ${row.libelle}` }))}/><Input label="Quantite produite" type="number" value={form.quantite_entree || ""} onChange={(event) => setForm({ ...form, quantite_entree: event.target.value })}/><Select label="Unite" value={form.unite_mesure} onChange={(event) => setForm({ ...form, unite_mesure: event.target.value })} options={["PIECE", "KG", "Litre"]}/><Input label="Cout unitaire" type="number" value={form.cout_production_unitaire || ""} onChange={(event) => setForm({ ...form, cout_production_unitaire: event.target.value })}/></>}</div>
+    <Modal open={modal === "product" || modal === "entry"} title={modal === "product" ? selectedId ? "Modifier la référence produit" : "Ajouter une référence produit" : "Enregistrer une fabrication"} onClose={() => setModal(null)} footer={<><Button onClick={() => setModal(null)}>Annuler</Button><Button variant="primary" onClick={submit}>Enregistrer</Button></>}>
+      {error && <div className="form-error">{error}</div>}<div className="form-grid" style={{ marginTop: 12 }}>{modal === "product" ? <><Input label="Libelle" value={form.libelle || ""} onChange={(event) => setForm({ ...form, libelle: event.target.value })}/><Input label="Unite" value={form.unite || ""} onChange={(event) => setForm({ ...form, unite: event.target.value })}/><Input label="Prix unitaire" type="number" value={form.prix_unitaire || ""} onChange={(event) => setForm({ ...form, prix_unitaire: event.target.value })}/></> : <><Select label="Produit fini" value={form.id_produit_fini} onChange={(event) => setForm({ ...form, id_produit_fini: event.target.value })} options={products.map((row) => ({ value: row.id, label: `${row.code} - ${row.libelle}` }))}/><Input label="Quantite produite" type="number" value={form.quantite_entree || ""} onChange={(event) => setForm({ ...form, quantite_entree: event.target.value })}/><Select label="Unite" value={form.unite_mesure} onChange={(event) => setForm({ ...form, unite_mesure: event.target.value })} options={["PIECE", "KG", "Litre"]}/><Input label="Cout unitaire" type="number" value={form.cout_production_unitaire || ""} onChange={(event) => setForm({ ...form, cout_production_unitaire: event.target.value })}/></>}</div>
     </Modal>
     <Modal open={modal === "message"} title="Operation impossible" onClose={() => setModal(null)} footer={<Button variant="primary" onClick={() => setModal(null)}>Fermer</Button>}><div className="form-error">{error}</div></Modal>
   </div>;

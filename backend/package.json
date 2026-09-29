@@ -13,6 +13,7 @@
     "db:migrate": "node scripts/migrateDatabase.js",
     "db:backup": "node scripts/backupDatabase.js",
     "seed:operational": "node scripts/seed-operational-data.js",
+    "seed:100": "node scripts/seed-100-records.js",
     "check": "node scripts/checkBackend.js",
     "test": "node --test tests/*.test.js"
   },

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CircleDollarSign, ContactRound, FileDown, Pencil, Plus, Trash2, UsersRound } from "lucide-react";
 import useFetch from "../../../hooks/useFetch";
 import useAuth from "../../auth/hooks/useAuth";
@@ -6,6 +6,8 @@ import { createClient, deleteClient, getClientHistory, listClients, updateClient
 import Button from "../../../components/common/Button";
 import Modal from "../../../components/common/Modal";
 import Input from "../../../components/common/Input";
+import Select from "../../../components/common/Select";
+import SearchBar from "../../../components/common/SearchBar";
 import Table from "../../../components/common/Table";
 import Badge from "../../../components/common/Badge";
 import Loader from "../../../components/common/Loader";
@@ -18,19 +20,26 @@ export default function ClientsPage() {
   const state = useFetch(listClients, []);
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
-  const [form, setForm] = useState({ solde_compte: 0 });
+  const [form, setForm] = useState({ solde_compte: 0, payment_mode: "Comptant", payment_days: 30 });
+  const [query, setQuery] = useState("");
   const [error, setError] = useState("");
-  if (state.loading) return <Loader />;
   const clients = state.data || [];
+  const filteredClients = useMemo(() => {
+    const term = query.trim().toLowerCase();
+    return term ? clients.filter((client) => `${client.code} ${client.raison_sociale} ${client.adresse} ${client.conditions_paiement}`.toLowerCase().includes(term)) : clients;
+  }, [clients, query]);
+  if (state.loading) return <Loader />;
   const openForm = (client = null) => {
     setSelectedId(client?.id || null); setError("");
-    setForm(client ? { code: client.code, raison_sociale: client.raison_sociale, adresse: client.adresse || "", conditions_paiement: client.conditions_paiement || "", solde_compte: client.solde_compte } : { solde_compte: 0 });
+    const days = Number(String(client?.conditions_paiement || "").match(/\d+/)?.[0] || 30);
+    const paymentMode = client && !String(client.conditions_paiement || "").toLowerCase().includes("comptant") ? "Tranche" : "Comptant";
+    setForm(client ? { raison_sociale: client.raison_sociale, adresse: client.adresse || "", payment_mode: paymentMode, payment_days: days, solde_compte: client.solde_compte } : { solde_compte: 0, payment_mode: "Comptant", payment_days: 30 });
     setOpen(true);
   };
   const submit = async () => {
     try {
-      const payload = { ...form, solde_compte: Number(form.solde_compte || 0) };
-      if (!payload.code) delete payload.code;
+      const { payment_mode, payment_days, ...values } = form;
+      const payload = { ...values, conditions_paiement: payment_mode === "Tranche" ? `Tranche - ${Number(payment_days)} jours` : "Comptant", solde_compte: Number(form.solde_compte || 0) };
       if (selectedId) await updateClient(selectedId, payload); else await createClient(payload);
       setOpen(false); await state.refresh();
     } catch (err) { setError(err.message); }
@@ -65,9 +74,10 @@ export default function ClientsPage() {
     <header className="page-header"><div><span className="eyebrow">Suivi commercial</span><h1>Clients</h1><p>Coordonnées, conditions de paiement et montants à recouvrer.</p></div><div className="page-actions"><Button icon={FileDown} onClick={allClientsPdf}>Imprimer la liste</Button><Button variant="primary" icon={Plus} onClick={() => openForm()}>Nouveau client</Button></div></header>
     {error && <div className="form-error">{error}</div>}
     <section className="metrics"><StatCard label="Clients enregistres" value={clients.length} detail="Comptes commerciaux" icon={UsersRound}/><StatCard label="Solde a recouvrer" value={formatCurrency(solde)} detail="Creances cumulees" icon={CircleDollarSign} tone={solde>0?"orange":"green"}/><StatCard label="Comptes a jour" value={clients.filter(row=>Number(row.solde_compte)===0).length} detail="Sans creance" icon={ContactRound} tone="green"/><StatCard label="Comptes debiteurs" value={clients.filter(row=>Number(row.solde_compte)>0).length} detail="Suivi necessaire" icon={CircleDollarSign} tone="red"/></section>
-    <section className="panel"><div className="panel-head"><h2>Liste des clients</h2><Badge>{clients.length} client(s)</Badge></div><Table rows={clients} columns={cols}/></section>
+    <div className="toolbar"><Badge>{filteredClients.length} client(s)</Badge><SearchBar value={query} onChange={setQuery} placeholder="Filtrer les clients..." /></div>
+    <section className="panel"><div className="panel-head"><h2>Liste des clients</h2><Badge>{filteredClients.length} client(s)</Badge></div><Table rows={filteredClients} columns={cols}/></section>
     <Modal open={open} title={selectedId ? "Modifier le client" : "Nouveau client"} onClose={() => setOpen(false)} footer={<><Button onClick={() => setOpen(false)}>Annuler</Button><Button variant="primary" onClick={submit}>Enregistrer</Button></>}>
-      {error && <div className="form-error">{error}</div>}<div className="form-grid" style={{marginTop:12}}><Input label="Code automatique" value={form.code || "Créé après enregistrement"} disabled={!selectedId} onChange={event=>setForm({...form,code:event.target.value})}/><Input label="Nom ou raison sociale" value={form.raison_sociale||""} onChange={event=>setForm({...form,raison_sociale:event.target.value})}/><Input className="full" label="Adresse" value={form.adresse||""} onChange={event=>setForm({...form,adresse:event.target.value})}/><Input label="Conditions de paiement" value={form.conditions_paiement||""} onChange={event=>setForm({...form,conditions_paiement:event.target.value})}/></div>
+      {error && <div className="form-error">{error}</div>}<div className="form-grid" style={{marginTop:12}}><Input className="full" label="Nom ou raison sociale" value={form.raison_sociale||""} onChange={event=>setForm({...form,raison_sociale:event.target.value})}/><Input className="full" label="Adresse" value={form.adresse||""} onChange={event=>setForm({...form,adresse:event.target.value})}/><Select label="Conditions de paiement" value={form.payment_mode} onChange={event=>setForm({...form,payment_mode:event.target.value})} options={["Comptant","Tranche"]}/>{form.payment_mode === "Tranche" && <Input label="Delai de paiement (jours)" type="number" min="1" value={form.payment_days||""} onChange={event=>setForm({...form,payment_days:event.target.value})}/>}</div>
     </Modal>
   </div>;
 }
