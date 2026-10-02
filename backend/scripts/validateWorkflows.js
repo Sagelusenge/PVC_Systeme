@@ -70,11 +70,15 @@ function money(value) {
   }
   console.log(`OK  commande ${order.numero} -> vente ${sale.id}: produits, quantites et total identiques`);
 
-  const activePayments = (sale.paiements || []).filter((payment) => payment.statut_paiement !== "Annulé");
-  const paidTotal = money(activePayments.reduce((sum, payment) => sum + Number(payment.montant_paye || 0), 0));
-  assert.equal(paidTotal, money(sale.montant_payee), "total des paiements incoherent avec la vente");
-  assert.ok(paidTotal <= money(sale.montant_total_vente), "paiement superieur a la facture");
-  console.log(`OK  vente -> paiements: ${activePayments.length} reglement(s), total coherent`);
+  const payment = payments.find((item) => item.id_vente && item.statut_paiement !== "Annulé");
+  assert.ok(payment, "paiement client actif introuvable");
+  const paidSale = await request(`/ventes/${payment.id_vente}`, token);
+  assert.equal(Number(payment.id_client), Number(paidSale.client_id), "client paiement/vente different");
+  const activePayments = (paidSale.paiements || []).filter((item) => item.statut_paiement !== "Annulé");
+  const paidTotal = money(activePayments.reduce((sum, item) => sum + Number(item.montant_paye || 0), 0));
+  assert.equal(paidTotal, money(paidSale.montant_payee), "total des paiements incoherent avec la vente");
+  assert.ok(paidTotal <= money(paidSale.montant_total_vente), "paiement superieur a la facture");
+  console.log(`OK  vente ${paidSale.id} -> paiements: ${activePayments.length} reglement(s), client et total coherents`);
 
   const documents = new Map();
   for (const row of journal) {

@@ -42,6 +42,7 @@ Pour chaque compte, le test verifie le profil retourne, le tableau de bord et to
 - 100 immobilisations controlees ;
 - 398 lignes comptables controlees ;
 - commande `CMD-2026-0090` et vente `104` coherentes sur le client, les produits, les quantites, les prix et le total ;
+- paiement reel rattache a la bonne vente et au bon client, sans depassement du total facture ;
 - 199 documents comptables equilibres entre debit et credit ;
 - 8 etats de sortie accessibles et retournant un format valide.
 
