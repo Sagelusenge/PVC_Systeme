@@ -11,6 +11,7 @@ import RecentSales from "../components/RecentSales";
 import StockAlerts from "../components/StockAlerts";
 import SalesChart from "../../../components/charts/SalesChart";
 import { formatCurrency } from "../../../utils/currency";
+import { canAccessModule } from "../../../utils/permissions";
 
 const metric = (label, value, detail, icon, tone) => ({ label, value, detail, icon, tone });
 
@@ -75,9 +76,12 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const state = useFetch(async () => {
-    const [dashboard, alerts] = await Promise.all([getDashboard(), getStockAlerts()]);
+    const [dashboard, alerts] = await Promise.all([
+      getDashboard(),
+      canAccessModule(user?.nom_role, "stock") ? getStockAlerts() : Promise.resolve([]),
+    ]);
     return { dashboard, alerts };
-  }, []);
+  }, [user?.nom_role]);
   if (state.loading) return <Loader />;
   const data = state.data?.dashboard || {};
 

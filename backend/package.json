@@ -15,7 +15,10 @@
     "seed:operational": "node scripts/seed-operational-data.js",
     "seed:100": "node scripts/seed-100-records.js",
     "check": "node scripts/checkBackend.js",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "test:roles": "node scripts/validateRoleAccess.js",
+    "test:workflows": "node scripts/validateWorkflows.js",
+    "qa:production": "npm run test:roles && npm run test:workflows"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +36,7 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "supertest": "^7.3.1"
   }
 }
